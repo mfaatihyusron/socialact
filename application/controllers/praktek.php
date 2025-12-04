@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class praktek extends CI_Controller {
-	public function index()
+	public function index() 
 	{
 		$this->load->view('template');
 	}
@@ -12,5 +12,5 @@ class praktek extends CI_Controller {
 		$data['content'] = "formvalidasi";
 		$this->load->view('template', $data);
 	}
-	
+	// test baru
 }
