@@ -8,10 +8,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Fonts: Inter (Body) & Oswald (Heading) -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
@@ -19,10 +17,10 @@
             theme: {
                 extend: {
                     colors: {
-                        'brand-black': '#0a0a0a',   // Latar Belakang Utama
-                        'brand-card': '#121212',    // Latar Kartu
-                        'brand-green': '#10b981',   // Hijau Aksen (Upcoming)
-                        'brand-gray': '#6b7280',    // Warna Teks Detail
+                        'brand-black': '#0a0a0a',
+                        'brand-card': '#121212',
+                        'brand-green': '#10b981',
+                        'brand-gray': '#6b7280',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -35,130 +33,141 @@
 </head>
 <body class="bg-brand-black text-white min-h-screen flex items-center justify-center p-6">
 
-    <!-- BAGIAN UTAMA: JADWAL AKSI -->
-    <section class="w-full max-w-7xl mx-auto">
+    <section class="w-full max-w-7xl mx-auto space-y-12">
         
-        <!-- Header Section -->
-        <div class="flex items-center gap-3 mb-8">
-            <!-- Garis Vertikal Hijau (Aksen) -->
-            <div class="w-1.5 h-10 bg-brand-green"></div>
-            <h2 class="font-heading text-4xl font-bold uppercase tracking-wide text-white">
-                Jadwal Aksi Terdekat
-            </h2>
+        <!-- HEADER & STATS (Agar tidak kosong di atas) -->
+        <div class="flex flex-col md:flex-row justify-between items-end gap-8 border-b border-gray-800 pb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-16 bg-brand-green shadow-[0_0_15px_#10b981]"></div>
+                <div>
+                    <span class="text-brand-green font-bold uppercase tracking-widest text-xs">Volunteer Hub</span>
+                    <h2 class="font-heading text-4xl md:text-5xl font-bold uppercase tracking-wide text-white leading-none mt-1">
+                        Jadwal Aksi<br>Terdekat
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Tambahan: Statistik Kilat -->
+            <div class="flex gap-8">
+                <div class="text-right">
+                    <h3 class="font-heading text-3xl font-bold text-white">5K+</h3>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">Total Relawan</p>
+                </div>
+                <div class="text-right border-l border-gray-700 pl-8">
+                    <h3 class="font-heading text-3xl font-bold text-brand-green">142</h3>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">Titik Lokasi</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Grid Container -->
+        <!-- GRID EVENT (Yang sebelumnya) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <!-- CARD 1: UPCOMING -->
-            <div class="bg-brand-card rounded-lg overflow-hidden border border-gray-800 group hover:border-brand-green transition-colors duration-300">
-                <!-- Image Wrapper -->
-                <div class="relative h-48 overflow-hidden">
-                    <img src="https://lh4.googleusercontent.com/LL4WVxZ1LQzJxFJx8r1MmqdXMYYYuJOHrMOooa0RCBeiREqGbIlw_ku9FBpU2TPelSxnqSJ3QmGq6660Fd5yzCNQE95FFakoIZDkeZbJvlGdljYSp0JZxbdsfrlBzKSl2kvSQ2TJFIo8xwuwfjBMqC8" 
-                         alt="Bersih Pantai" 
-                         class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
-                    
-                    <!-- Badge Status -->
-                    <span class="absolute top-4 right-4 bg-brand-green text-black text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-lg">
-                        Upcoming
-                    </span>
+            <!-- Card 1 -->
+            <div class="bg-brand-card rounded-xl overflow-hidden border border-gray-800 group hover:border-brand-green transition-all duration-300 relative">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-brand-green/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-brand-green/20 transition-all"></div>
+                
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1618477461853-5f87b7852ecf?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
+                    <span class="absolute top-4 right-4 bg-brand-green text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg animate-pulse">Open Rec</span>
                 </div>
-
-                <!-- Content -->
-                <div class="p-6">
-                    <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-white">Bersih Pantai Indah</h3>
-                    
-                    <div class="space-y-2 mb-6">
-                        <div class="flex items-center gap-3 text-sm text-gray-400">
-                            <i class="fas fa-calendar-alt text-brand-green w-4"></i>
-                            <span class="font-sans">11/12/2023</span>
+                <div class="p-6 relative z-10">
+                    <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-white group-hover:text-brand-green transition-colors">Bersih Pantai Indah</h3>
+                    <div class="space-y-3 mb-6 border-l-2 border-gray-700 pl-4">
+                        <div class="flex items-center gap-3 text-sm text-gray-300">
+                            <i class="fas fa-calendar-day text-brand-green"></i> <span>Minggu, 12 Nov 2023</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-gray-400">
-                            <i class="fas fa-map-marker-alt text-brand-green w-4"></i>
-                            <span class="font-sans">Pantai Indah Kapuk 2</span>
+                        <div class="flex items-center gap-3 text-sm text-gray-300">
+                            <i class="fas fa-clock text-brand-green"></i> <span>07:00 WIB - Selesai</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-300">
+                            <i class="fas fa-map-pin text-brand-green"></i> <span>Pantai Indah Kapuk 2</span>
                         </div>
                     </div>
-
-                    <!-- Button: White Background -->
-                    <button onclick="alert('Mendaftar ke event ini...')" class="w-full bg-white text-black font-bold py-3 rounded text-sm uppercase tracking-wider hover:bg-gray-200 transition-colors">
+                    <button class="w-full bg-white text-black font-bold py-3 rounded text-sm uppercase tracking-wider hover:bg-brand-green hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:-translate-y-1">
                         Daftar Sekarang
                     </button>
                 </div>
             </div>
 
-            <!-- CARD 2: UPCOMING -->
-            <div class="bg-brand-card rounded-lg overflow-hidden border border-gray-800 group hover:border-brand-green transition-colors duration-300">
-                <!-- Image Wrapper -->
-                <div class="relative h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=800&auto=format&fit=crop" 
-                         alt="Semut Sungai" 
-                         class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
-                    
-                    <!-- Badge Status -->
-                    <span class="absolute top-4 right-4 bg-brand-green text-black text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-lg">
-                        Upcoming
-                    </span>
+            <!-- Card 2 -->
+            <div class="bg-brand-card rounded-xl overflow-hidden border border-gray-800 group hover:border-brand-green transition-all duration-300">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
+                    <span class="absolute top-4 right-4 bg-brand-green text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">Open Rec</span>
                 </div>
-
-                <!-- Content -->
                 <div class="p-6">
-                    <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-white">Operasi Semut Sungai</h3>
-                    
-                    <div class="space-y-2 mb-6">
-                        <div class="flex items-center gap-3 text-sm text-gray-400">
-                            <i class="fas fa-calendar-alt text-brand-green w-4"></i>
-                            <span class="font-sans">11/15/2023</span>
+                    <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-white group-hover:text-brand-green transition-colors">Operasi Semut Sungai</h3>
+                    <div class="space-y-3 mb-6 border-l-2 border-gray-700 pl-4">
+                        <div class="flex items-center gap-3 text-sm text-gray-300">
+                            <i class="fas fa-calendar-day text-brand-green"></i> <span>Rabu, 15 Nov 2023</span>
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-gray-400">
-                            <i class="fas fa-map-marker-alt text-brand-green w-4"></i>
-                            <span class="font-sans">Bantaran Ciliwung</span>
+                        <div class="flex items-center gap-3 text-sm text-gray-300">
+                            <i class="fas fa-clock text-brand-green"></i> <span>08:00 WIB - Selesai</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-300">
+                            <i class="fas fa-map-pin text-brand-green"></i> <span>Bantaran Ciliwung</span>
                         </div>
                     </div>
-
-                    <!-- Button -->
-                    <button onclick="alert('Mendaftar ke event ini...')" class="w-full bg-white text-black font-bold py-3 rounded text-sm uppercase tracking-wider hover:bg-gray-200 transition-colors">
+                    <button class="w-full bg-white text-black font-bold py-3 rounded text-sm uppercase tracking-wider hover:bg-brand-green hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all transform hover:-translate-y-1">
                         Daftar Sekarang
                     </button>
                 </div>
             </div>
 
-            <!-- CARD 3: COMPLETED -->
-            <div class="bg-brand-card rounded-lg overflow-hidden border border-gray-800 opacity-75 hover:opacity-100 transition-opacity duration-300">
-                <!-- Image Wrapper -->
-                <div class="relative h-48 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop" 
-                         alt="Mangrove" 
-                         class="w-full h-full object-cover grayscale opacity-60">
-                    
-                    <!-- Badge Status: Completed (Gray) -->
-                    <span class="absolute top-4 right-4 bg-gray-600 text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-lg">
-                        Completed
-                    </span>
+            <!-- Card 3 (Completed) -->
+            <div class="bg-brand-card rounded-xl overflow-hidden border border-gray-800 opacity-60 hover:opacity-100 transition-all duration-300 grayscale hover:grayscale-0">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover">
+                    <span class="absolute top-4 right-4 bg-gray-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Selesai</span>
                 </div>
-
-                <!-- Content -->
                 <div class="p-6">
                     <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-gray-300">Mangrove Planting</h3>
-                    
-                    <div class="space-y-2 mb-6">
+                    <div class="space-y-3 mb-6 border-l-2 border-gray-700 pl-4">
                         <div class="flex items-center gap-3 text-sm text-gray-500">
-                            <i class="fas fa-calendar-alt text-gray-600 w-4"></i>
-                            <span class="font-sans">10/20/2023</span>
+                            <i class="fas fa-calendar-day"></i> <span>20 Okt 2023</span>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-gray-500">
-                            <i class="fas fa-map-marker-alt text-gray-600 w-4"></i>
-                            <span class="font-sans">Muara Angke</span>
+                            <i class="fas fa-check-circle"></i> <span>Sukses Terlaksana</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-500">
+                            <i class="fas fa-map-pin"></i> <span>Muara Angke</span>
                         </div>
                     </div>
-
-                    <!-- Button Disabled -->
-                    <button disabled class="w-full bg-transparent border border-gray-600 text-gray-500 font-bold py-3 rounded text-sm uppercase tracking-wider cursor-not-allowed">
-                        Pendaftaran Tutup
+                    <button disabled class="w-full bg-transparent border border-gray-700 text-gray-500 font-bold py-3 rounded text-sm uppercase tracking-wider cursor-not-allowed">
+                        Pendaftaran Ditutup
                     </button>
                 </div>
             </div>
-
         </div>
+
+        <!-- TAMBAHAN: ALUR PENDAFTARAN (Agar bagian bawah tidak kosong) -->
+        <div class="border-t border-gray-800 pt-10">
+            <h3 class="font-heading text-xl font-bold uppercase text-white mb-6 text-center"><span class="text-brand-green">///</span> Cara Bergabung</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <!-- Step 1 -->
+                <div class="p-6 bg-brand-card border border-gray-800 rounded-lg hover:border-gray-600 transition-colors">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-green text-xl font-bold border border-gray-700">1</div>
+                    <h4 class="font-bold text-white uppercase mb-2">Pilih Event</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Pilih jadwal dan lokasi aksi yang sesuai dengan domisili kamu.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="p-6 bg-brand-card border border-gray-800 rounded-lg hover:border-gray-600 transition-colors">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-green text-xl font-bold border border-gray-700">2</div>
+                    <h4 class="font-bold text-white uppercase mb-2">Isi Data Diri</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Lengkapi formulir pendaftaran singkat agar kami bisa mendata relawan.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="p-6 bg-brand-card border border-gray-800 rounded-lg hover:border-gray-600 transition-colors">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-green text-xl font-bold border border-gray-700">3</div>
+                    <h4 class="font-bold text-white uppercase mb-2">Datang & Aksi</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed">Bawa tumbler, pakai sepatu tertutup, dan siap kotor demi bumi yang bersih.</p>
+                </div>
+            </div>
+        </div>
+
     </section>
 
 </body>
