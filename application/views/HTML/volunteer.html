@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Aksi Terdekat - Volunteer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: Inter (Body) & Oswald (Heading) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-black': '#0a0a0a',   // Latar Belakang Utama
+                        'brand-card': '#121212',    // Latar Kartu
+                        'brand-green': '#10b981',   // Hijau Aksen (Upcoming)
+                        'brand-gray': '#6b7280',    // Warna Teks Detail
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Oswald', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-black text-white min-h-screen flex items-center justify-center p-6">
+
+    <!-- BAGIAN UTAMA: JADWAL AKSI -->
+    <section class="w-full max-w-7xl mx-auto">
+        
+        <!-- Header Section -->
+        <div class="flex items-center gap-3 mb-8">
+            <!-- Garis Vertikal Hijau (Aksen) -->
+            <div class="w-1.5 h-10 bg-brand-green"></div>
+            <h2 class="font-heading text-4xl font-bold uppercase tracking-wide text-white">
+                Jadwal Aksi Terdekat
+            </h2>
+        </div>
+
+        <!-- Grid Container -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- CARD 1: UPCOMING -->
+            <div class="bg-brand-card rounded-lg overflow-hidden border border-gray-800 group hover:border-brand-green transition-colors duration-300">
+                <!-- Image Wrapper -->
+                <div class="relative h-48 overflow-hidden">
+                    <img src="https://lh4.googleusercontent.com/LL4WVxZ1LQzJxFJx8r1MmqdXMYYYuJOHrMOooa0RCBeiREqGbIlw_ku9FBpU2TPelSxnqSJ3QmGq6660Fd5yzCNQE95FFakoIZDkeZbJvlGdljYSp0JZxbdsfrlBzKSl2kvSQ2TJFIo8xwuwfjBMqC8" 
+                         alt="Bersih Pantai" 
+                         class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+                    
+                    <!-- Badge Status -->
+                    <span class="absolute top-4 right-4 bg-brand-green text-black text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-lg">
+                        Upcoming
+                    </span>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-white">Bersih Pantai Indah</h3>
+                    
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-center gap-3 text-sm text-gray-400">
+                            <i class="fas fa-calendar-alt text-brand-green w-4"></i>
+                            <span class="font-sans">11/12/2023</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-400">
+                            <i class="fas fa-map-marker-alt text-brand-green w-4"></i>
+                            <span class="font-sans">Pantai Indah Kapuk 2</span>
+                        </div>
+                    </div>
+
+                    <!-- Button: White Background -->
+                    <button onclick="alert('Mendaftar ke event ini...')" class="w-full bg-white text-black font-bold py-3 rounded text-sm uppercase tracking-wider hover:bg-gray-200 transition-colors">
+                        Daftar Sekarang
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD 2: UPCOMING -->
+            <div class="bg-brand-card rounded-lg overflow-hidden border border-gray-800 group hover:border-brand-green transition-colors duration-300">
+                <!-- Image Wrapper -->
+                <div class="relative h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1621451537084-482c73073a0f?q=80&w=800&auto=format&fit=crop" 
+                         alt="Semut Sungai" 
+                         class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+                    
+                    <!-- Badge Status -->
+                    <span class="absolute top-4 right-4 bg-brand-green text-black text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-lg">
+                        Upcoming
+                    </span>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-white">Operasi Semut Sungai</h3>
+                    
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-center gap-3 text-sm text-gray-400">
+                            <i class="fas fa-calendar-alt text-brand-green w-4"></i>
+                            <span class="font-sans">11/15/2023</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-400">
+                            <i class="fas fa-map-marker-alt text-brand-green w-4"></i>
+                            <span class="font-sans">Bantaran Ciliwung</span>
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    <button onclick="alert('Mendaftar ke event ini...')" class="w-full bg-white text-black font-bold py-3 rounded text-sm uppercase tracking-wider hover:bg-gray-200 transition-colors">
+                        Daftar Sekarang
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD 3: COMPLETED -->
+            <div class="bg-brand-card rounded-lg overflow-hidden border border-gray-800 opacity-75 hover:opacity-100 transition-opacity duration-300">
+                <!-- Image Wrapper -->
+                <div class="relative h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop" 
+                         alt="Mangrove" 
+                         class="w-full h-full object-cover grayscale opacity-60">
+                    
+                    <!-- Badge Status: Completed (Gray) -->
+                    <span class="absolute top-4 right-4 bg-gray-600 text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shadow-lg">
+                        Completed
+                    </span>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <h3 class="font-heading text-2xl font-bold uppercase mb-4 text-gray-300">Mangrove Planting</h3>
+                    
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-center gap-3 text-sm text-gray-500">
+                            <i class="fas fa-calendar-alt text-gray-600 w-4"></i>
+                            <span class="font-sans">10/20/2023</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-500">
+                            <i class="fas fa-map-marker-alt text-gray-600 w-4"></i>
+                            <span class="font-sans">Muara Angke</span>
+                        </div>
+                    </div>
+
+                    <!-- Button Disabled -->
+                    <button disabled class="w-full bg-transparent border border-gray-600 text-gray-500 font-bold py-3 rounded text-sm uppercase tracking-wider cursor-not-allowed">
+                        Pendaftaran Tutup
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+</body>
+</html>
