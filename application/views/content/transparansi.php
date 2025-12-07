@@ -72,11 +72,11 @@
         </div>
     </div>
 
-    <!-- Tabel Pemasukan (Donasi) - FITUR TAMBAHAN -->
-    <div class="bg-brand-dark rounded-2xl border border-gray-800 overflow-hidden">
+    <!-- Tabel Pemasukan (Donasi) -->
+    <div class="bg-brand-dark rounded-2xl border border-gray-800 overflow-hidden mb-16">
         <div class="p-6 border-b border-gray-700 flex justify-between items-center">
             <h3 class="font-bold text-xl uppercase text-white"><span class="text-brand-green">IN</span> - Donasi Masuk Terverifikasi</h3>
-            <a href="<?= base_url('donasi') ?>" class="text-xs bg-brand-green text-black px-3 py-1 rounded font-bold hover:bg-white transition">DONASI SEKARANG</a>
+            <!-- Tombol kecil dihapus dari sini -->
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -103,6 +103,38 @@
             </table>
         </div>
     </div>
+
+    <!-- SECTION AJAKAN DONASI (HIGHLIGHTED & PALING BAWAH) -->
+    <div class="relative rounded-2xl overflow-hidden p-10 md:p-14 text-center border border-brand-green/30 bg-[#0f1510] shadow-[0_0_50px_rgba(16,185,129,0.1)]">
+        
+        <!-- Efek Dekorasi -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-green to-transparent"></div>
+        <div class="absolute -left-20 top-1/2 w-60 h-60 bg-brand-green/10 rounded-full blur-3xl"></div>
+        <div class="absolute -right-20 top-1/2 w-60 h-60 bg-brand-green/10 rounded-full blur-3xl"></div>
+
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <span class="inline-block py-1 px-3 rounded-full bg-brand-green/10 border border-brand-green/30 text-brand-green text-xs font-bold uppercase tracking-widest mb-4">
+                Bergabunglah Bersama Kami
+            </span>
+            <h2 class="font-heading text-3xl md:text-5xl font-bold uppercase text-white mb-6 leading-tight">
+                Jadilah Bagian dari <span class="text-brand-green">Perubahan Nyata</span>
+            </h2>
+            <p class="text-gray-400 mb-10 text-lg">
+                Dana yang terkumpul akan digunakan sepenuhnya untuk operasional pembersihan sungai, peralatan relawan, dan logistik. Transparansi adalah janji kami.
+            </p>
+            
+            <!-- Tombol Highlight Besar -->
+            <a href="<?= base_url('donasi') ?>" class="group inline-flex items-center gap-3 px-10 py-5 bg-brand-green text-black font-bold text-xl uppercase tracking-widest rounded hover:bg-white hover:scale-105 transition-all shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:shadow-[0_0_50px_rgba(255,255,255,0.6)]">
+                <span>Donasi Sekarang</span>
+                <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+            </a>
+            
+            <p class="mt-6 text-xs text-gray-500 font-mono">
+                <i class="fas fa-lock mr-1"></i> Pembayaran Aman & Terverifikasi
+            </p>
+        </div>
+    </div>
+
 </div>
 
 <script>
