@@ -5,35 +5,29 @@ class Web extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        // $this->load->model('Main_model'); // Load model jika ada
+        $this->load->model('App_model');
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->library('session');
+        $this->load->database();
     }
 
     // 1. HALAMAN HOME
     public function index() {
         $data['title'] = "Home - SocialAct";
-        // Tentukan file konten yang akan dimuat
         $data['content'] = 'content/home'; 
-        // Load layout utama, kirim variabel $content
         $this->load->view('layout/main', $data);
     }
 
     // 2. HALAMAN TRANSPARANSI
     public function transparansi() {
         $data['title'] = "Transparansi Dana - SocialAct";
-        
-        // Contoh Data Dummy (Nanti diganti dari Database)
-        $data['saldo'] = 25000000;
-        $data['total_masuk'] = 45000000;
-        $data['total_keluar'] = 20000000;
-        $data['pengeluaran'] = []; // Isi array object dari DB
-        $data['chart_data'] = [
-            ['category' => 'Logistik', 'total' => 10000000],
-            ['category' => 'Operasional', 'total' => 5000000]
-        ];
-
+        $data['saldo'] = $this->App_model->get_saldo();
+        $data['total_masuk'] = $this->App_model->get_total_masuk();
+        $data['total_keluar'] = $this->App_model->get_total_keluar();
+        $data['pengeluaran'] = $this->App_model->get_all_expenses();
+        $data['donasi'] = $this->App_model->get_verified_donations();
+        $data['chart_data'] = $this->App_model->get_chart_data();
         $data['content'] = 'content/transparansi';
         $this->load->view('layout/main', $data);
     }
@@ -41,14 +35,104 @@ class Web extends CI_Controller {
     // 3. HALAMAN LAPOR
     public function lapor() {
         $data['title'] = "Lapor Sampah - SocialAct";
+        $data['semua_laporan'] = $this->App_model->get_all_reports(); 
+        $data['laporan_selesai'] = $this->App_model->get_resolved_reports(); 
         $data['content'] = 'content/lapor';
         $this->load->view('layout/main', $data);
     }
 
-    // 4. HALAMAN VOLUNTEER
+    // --- FITUR LAPOR: SUBMIT LAPORAN ---
+    public function lapor_submit() {
+        $config['upload_path']   = './uploads/reports/'; 
+        $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        $config['max_size']      = 10240; 
+        $config['encrypt_name']  = TRUE;
+
+        $this->load->library('upload', $config);
+
+        if (!is_dir('./uploads/reports/')) mkdir('./uploads/reports/', 0777, true);
+
+        if ( ! $this->upload->do_upload('image_before')) {
+            $file_name = 'default.jpg'; 
+        } else {
+            $upload_data = $this->upload->data();
+            $file_name = $upload_data['file_name'];
+        }
+
+        $data = [
+            'reporter_name' => $this->input->post('reporter_name'),
+            'reporter_contact' => $this->input->post('reporter_contact'),
+            'location_address' => $this->input->post('location_address'),
+            'latitude' => $this->input->post('latitude'),
+            'longitude' => $this->input->post('longitude'),
+            'description' => $this->input->post('description'),
+            'image_before_url' => $file_name,
+            'status' => 'pending',
+            'created_at' => date('Y-m-d H:i:s'),
+            'views' => 0
+        ];
+
+        if($this->App_model->insert_report($data)) {
+            $this->session->set_flashdata('success', 'Laporan berhasil dikirim! Menunggu verifikasi admin.');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menyimpan ke database.');
+        }
+        
+        redirect('web/lapor');
+    }
+
+    public function add_view($report_id) {
+        if ($report_id) {
+            $this->App_model->increment_views($report_id);
+            echo json_encode(['status' => 'success', 'id' => $report_id]);
+        }
+    }
+
+    // 4. HALAMAN VOLUNTEER (UPDATED: REAL COUNT)
     public function volunteer() {
         $data['title'] = "Volunteer Hub - SocialAct";
+        
+        // Ambil events
+        $events = $this->App_model->get_upcoming_events();
+        
+        // Hitung jumlah pendaftar per event (Real Count)
+        foreach ($events as &$ev) {
+            // Cek apakah tabel volunteers ada (untuk hindari error kalau blm dibuat)
+            if ($this->db->table_exists('volunteers')) {
+                $ev->registered_count = $this->db->where('event_id', $ev->id)->count_all_results('volunteers');
+            } else {
+                $ev->registered_count = 0; // Fallback kalau tabel blm ada
+            }
+        }
+
+        $data['events'] = $events;
         $data['content'] = 'content/volunteer';
         $this->load->view('layout/main', $data);
+    }
+
+    // --- FITUR BARU: DAFTAR VOLUNTEER (REAL INSERT) ---
+    public function register_volunteer() {
+        // Ambil data detail dari form baru
+        $data = [
+            'event_id' => $this->input->post('event_id'),
+            'name' => $this->input->post('name'),
+            'email' => $this->input->post('email'),
+            'phone' => $this->input->post('phone'),
+            'gender' => $this->input->post('gender'),
+            'age' => $this->input->post('age'),
+            'domicile' => $this->input->post('domicile'),
+            'experience' => $this->input->post('experience'),
+            'motivation' => $this->input->post('motivation'),
+            // 'registered_at' otomatis current timestamp
+        ];
+
+        // Simpan ke database
+        if ($this->db->insert('volunteers', $data)) {
+            $this->session->set_flashdata('success', 'Selamat ' . $data['name'] . '! Anda berhasil terdaftar. Admin akan menghubungi via WhatsApp.');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal mendaftar. Silakan coba lagi.');
+        }
+        
+        redirect('web/volunteer');
     }
 }

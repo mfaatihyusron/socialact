@@ -48,12 +48,26 @@ class App_model extends CI_Model {
         return $this->db->order_by('created_at', 'DESC')->get('waste_reports')->result();
     }
 
-    public function get_resolved_reports() {
-        return $this->db->where('status', 'resolved')->where('image_after_url !=', NULL)->get('waste_reports')->result();
-    }
-
     public function insert_report($data) {
         return $this->db->insert('waste_reports', $data);
+    }
+
+// --- FITUR BARU: VIEW COUNT ---
+    
+    // Fungsi nambah views +1
+    public function increment_views($report_id) {
+        $this->db->set('views', 'views+1', FALSE); // FALSE biar ga dianggap string
+        $this->db->where('id', $report_id);
+        $this->db->update('waste_reports');
+    }
+
+    // Update fungsi get_resolved_reports biar ngambil kolom views juga
+    // (Sebenarnya get() udah otomatis ambil semua kolom (*), jadi aman)
+    public function get_resolved_reports() {
+        return $this->db->where('status', 'resolved')
+                        ->where('image_after_url !=', NULL)
+                        ->order_by('cleaned_at', 'DESC') 
+                        ->get('waste_reports')->result();
     }
 
     // --- BAGIAN VOLUNTEER & EVENTS ---
