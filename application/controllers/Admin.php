@@ -35,7 +35,7 @@ class Admin extends CI_Controller {
         $data['pengeluaran'] = $this->Admin_model->get_recent_expenses(10);
         $data['chart_data'] = $this->Admin_model->get_expense_chart_data();
         $data['content'] = 'admin/finance';
-        $this->load->view('layout/admin', $data);
+        $this->load->view('layout/lay_admin', $data);
     }
 
     public function add_transaction() {
@@ -98,7 +98,7 @@ class Admin extends CI_Controller {
         $data['events'] = $events;
 
         $data['content'] = 'admin/content';
-        $this->load->view('layout/admin', $data);
+        $this->load->view('layout/lay_admin', $data);
     }
 
     // --- LOGIC VALIDASI STATUS ---
@@ -275,7 +275,7 @@ class Admin extends CI_Controller {
         $data['count_report'] = $this->Admin_model->get_count('waste_reports');
         $data['total_fund'] = $this->Admin_model->get_balance();
         $data['content'] = 'admin/super';
-        $this->load->view('layout/admin', $data);
+        $this->load->view('layout/lay_admin', $data);
     }
 
     public function add_admin() {
