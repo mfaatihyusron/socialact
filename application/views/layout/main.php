@@ -64,20 +64,14 @@
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4 px-6 md:px-12 flex justify-between items-center backdrop-blur-sm bg-black/70 border-b border-white/10">
         <a href="<?= base_url() ?>" class="flex items-center gap-2 cursor-pointer">
             <div class="w-8 h-8 bg-white text-black flex items-center justify-center font-bold rounded-sm">P</div>
-            <span class="font-heading text-xl tracking-wider font-bold uppercase">Pandawara <span class="text-brand-green">Style</span></span>
+            <span class="font-heading text-xl tracking-wider font-bold uppercase">Social<span class="text-brand-green">Act</span></span>
         </a>
         
         <!-- BAGIAN MENU YANG ANDA MINTA -->
         <div class="hidden md:flex gap-6 text-sm font-semibold tracking-wide uppercase text-gray-300">
 
-            <a href="<?= base_url('transparansi') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'transparansi' ? 'text-brand-green' : '' ?>">Rincian Transaksi</a>
-            
-            <a href="<?= base_url('lapor') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'lapor' ? 'text-brand-green' : '' ?>">Halaman Laporan</a>
-            
-            <a href="<?= base_url('transparansi') ?>" class="hover:text-brand-green transition-colors">Form Donasi</a>
-            
-            <a href="<?= base_url('lapor') ?>" class="hover:text-brand-green transition-colors">Form Pengaduan</a>
-            
+            <a href="<?= base_url('transparansi') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'transparansi' ? 'text-brand-green' : '' ?>">Transparansi</a>
+            <a href="<?= base_url('lapor') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'lapor' ? 'text-brand-green' : '' ?>">Pengaduan</a>          
             <!-- Link Admin (Opsional, saya taruh di ujung kanan sebagai icon) -->
             <a href="<?= base_url('volunteer') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'volunteer' ? 'text-brand-green' : '' ?>">Volunteer</a>
 
