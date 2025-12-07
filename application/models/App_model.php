@@ -6,7 +6,6 @@ class App_model extends CI_Model {
     // --- BAGIAN KEUANGAN & DONASI ---
     
     public function get_saldo() {
-        // Hitung Saldo: Total Masuk (Verified) - Total Keluar
         $masuk = $this->db->select_sum('amount')->where('status', 'verified')->get('donations')->row()->amount;
         $keluar = $this->db->select_sum('amount')->get('expenses')->row()->amount;
         return $masuk - $keluar;
@@ -38,43 +37,32 @@ class App_model extends CI_Model {
         return $this->db->get('expenses')->result_array();
     }
 
-    public function insert_expense($data) {
-        return $this->db->insert('expenses', $data);
-    }
-
     // --- BAGIAN LAPORAN SAMPAH (GIS) ---
 
     public function get_all_reports() {
         return $this->db->order_by('created_at', 'DESC')->get('waste_reports')->result();
     }
 
-    public function insert_report($data) {
-        return $this->db->insert('waste_reports', $data);
-    }
-
-// --- FITUR BARU: VIEW COUNT ---
-    
-    // Fungsi nambah views +1
-    public function increment_views($report_id) {
-        $this->db->set('views', 'views+1', FALSE); // FALSE biar ga dianggap string
-        $this->db->where('id', $report_id);
-        $this->db->update('waste_reports');
-    }
-
-    // Update fungsi get_resolved_reports biar ngambil kolom views juga
-    // (Sebenarnya get() udah otomatis ambil semua kolom (*), jadi aman)
     public function get_resolved_reports() {
+        // Filter hanya yang statusnya resolved DAN punya foto after
         return $this->db->where('status', 'resolved')
                         ->where('image_after_url !=', NULL)
                         ->order_by('cleaned_at', 'DESC') 
                         ->get('waste_reports')->result();
     }
 
-    // --- BAGIAN VOLUNTEER & EVENTS ---
-
-    public function get_all_events() {
-        return $this->db->order_by('event_date', 'ASC')->get('volunteer_events')->result();
+    public function insert_report($data) {
+        return $this->db->insert('waste_reports', $data);
     }
+
+    // --- FITUR BARU: VIEW COUNT ---
+    public function increment_views($report_id) {
+        $this->db->set('views', 'views+1', FALSE);
+        $this->db->where('id', $report_id);
+        $this->db->update('waste_reports');
+    }
+
+    // --- BAGIAN VOLUNTEER & EVENTS ---
 
     public function get_upcoming_events() {
         return $this->db->where('status', 'upcoming')->order_by('event_date', 'ASC')->get('volunteer_events')->result();
