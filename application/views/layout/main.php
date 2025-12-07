@@ -63,7 +63,6 @@
     <!-- NAVBAR MASTER -->
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4 px-6 md:px-12 flex justify-between items-center backdrop-blur-sm bg-black/70 border-b border-white/10">
         <a href="<?= base_url() ?>" class="flex items-center gap-2 cursor-pointer">
-            <div class="w-8 h-8 bg-white text-black flex items-center justify-center font-bold rounded-sm">P</div>
             <span class="font-heading text-xl tracking-wider font-bold uppercase">Social<span class="text-brand-green">Act</span></span>
         </a>
         
