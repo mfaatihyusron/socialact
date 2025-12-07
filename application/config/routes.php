@@ -13,6 +13,7 @@ $route['default_controller'] = 'web';
 $route['transparansi']       = 'web/transparansi';
 $route['lapor']              = 'web/lapor';
 $route['volunteer']          = 'web/volunteer';
+$route['donasi']             = 'web/donasi';
 
 // 2. RUTE AKSI FORM (Handling Submit)
 // Agar form action 'lapor/submit' di view tetap bekerja meski controller aslinya bernama 'Web'
