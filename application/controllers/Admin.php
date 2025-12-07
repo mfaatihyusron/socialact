@@ -11,13 +11,13 @@ class Admin extends CI_Controller {
         $this->load->helper('form'); 
         $this->load->model('Admin_model');
 
-        // Cek Login
+        // Cek Login untuk semua fungsi di controller ini
         if (!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
     }
 
-    // Redirect Dashboard sesuai Role
+    // Redirect Dashboard sesuai Role saat akses /admin
     public function index() {
         $role = $this->session->userdata('role');
         if ($role == 'finance') redirect('admin/finance');
@@ -25,15 +25,24 @@ class Admin extends CI_Controller {
         else redirect('admin/super');
     }
 
-    // ... (Fungsi Finance sama seperti sebelumnya) ...
+    // ==========================================
+    // BAGIAN 1: FINANCE DASHBOARD & LOGIC
+    // ==========================================
+    
     public function finance() {
         if (!in_array($this->session->userdata('role'), ['finance', 'super_admin'])) show_404();
+
         $data['title'] = "Finance Dashboard";
         $data['user'] = $this->session->userdata();
+        
+        // LOAD ACCOUNTS UNTUK DROPDOWN
+        $data['accounts'] = $this->Admin_model->get_all_accounts();
+
         $data['saldo'] = $this->Admin_model->get_balance();
         $data['donasi'] = $this->Admin_model->get_recent_donations(10);
-        $data['pengeluaran'] = $this->Admin_model->get_recent_expenses(10);
+        $data['pengeluaran'] = $this->Admin_model->get_recent_expenses(20); 
         $data['chart_data'] = $this->Admin_model->get_expense_chart_data();
+        
         $data['content'] = 'admin/finance';
         $this->load->view('layout/lay_admin', $data);
     }
@@ -41,54 +50,159 @@ class Admin extends CI_Controller {
     public function add_transaction() {
         $type = $this->input->post('type');
         $amount = $this->input->post('amount');
-        $account_id = 1;
+        
+        // AMBIL ACCOUNT_ID DARI INPUT FORM
+        $account_id = $this->input->post('account_id');
 
         if ($type == 'out') {
+            // Upload Config
+            $path = FCPATH . 'uploads/expenses/';
+            if (!is_dir($path)) mkdir($path, 0777, true);
+
+            $config['upload_path']   = $path;
+            $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
+            $config['max_size']      = 5120; 
+            $config['encrypt_name']  = TRUE;
+            
+            $this->load->library('upload', $config);
+
+            $receipt_url = null;
+            $item_url = null;
+
+            if (!empty($_FILES['receipt_image']['name'])) {
+                if ($this->upload->do_upload('receipt_image')) {
+                    $up = $this->upload->data();
+                    $receipt_url = $up['file_name'];
+                }
+            }
+
+            $this->upload->initialize($config); 
+            if (!empty($_FILES['item_image']['name'])) {
+                if ($this->upload->do_upload('item_image')) {
+                    $up = $this->upload->data();
+                    $item_url = $up['file_name'];
+                }
+            }
+
             $data = [
                 'title' => $this->input->post('title'),
                 'description' => $this->input->post('description'),
                 'amount' => $amount,
                 'category' => $this->input->post('category'),
                 'transaction_date' => $this->input->post('date'),
-                'account_id' => $account_id,
+                'account_id' => $account_id, // Gunakan ID akun yang dipilih
+                'receipt_image_url' => $receipt_url,
+                'item_image_url' => $item_url,
                 'created_by' => $this->session->userdata('user_id')
             ];
+            
+            // Model insert_expense akan otomatis memotong saldo akun ID ini
             $this->Admin_model->insert_expense($data);
+
         } else {
+            // Pemasukan
             $data = [
                 'donor_name' => 'Manual Input (Admin)',
                 'donor_email' => 'admin@local',
                 'amount' => $amount,
                 'message' => $this->input->post('title'),
-                'account_id' => $account_id,
+                'account_id' => $account_id, // Gunakan ID akun yang dipilih
                 'status' => 'verified',
                 'verified_by' => $this->session->userdata('user_id'),
                 'verified_at' => date('Y-m-d H:i:s')
             ];
+            // Model insert_income akan otomatis menambah saldo akun ID ini
             $this->Admin_model->insert_income_manual($data);
         }
+
         $this->session->set_flashdata('success', 'Transaksi berhasil disimpan!');
         redirect('admin/finance');
     }
 
+    public function update_expense() {
+        $id = $this->input->post('expense_id');
+        
+        $old_data = $this->Admin_model->get_expense_by_id($id);
+        if(!$old_data) show_404();
+
+        // Config Upload
+        $path = FCPATH . 'uploads/expenses/';
+        $config['upload_path']   = $path;
+        $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
+        $config['max_size']      = 5120;
+        $config['encrypt_name']  = TRUE;
+        $this->load->library('upload', $config);
+
+        $receipt_url = $old_data->receipt_image_url;
+        $item_url = $old_data->item_image_url;
+
+        if (!empty($_FILES['receipt_image']['name'])) {
+            if ($this->upload->do_upload('receipt_image')) {
+                $up = $this->upload->data();
+                $receipt_url = $up['file_name'];
+            }
+        }
+
+        $this->upload->initialize($config);
+        if (!empty($_FILES['item_image']['name'])) {
+            if ($this->upload->do_upload('item_image')) {
+                $up = $this->upload->data();
+                $item_url = $up['file_name'];
+            }
+        }
+
+        $data = [
+            'title' => $this->input->post('title'),
+            'description' => $this->input->post('description'),
+            'amount' => $this->input->post('amount'),
+            'category' => $this->input->post('category'),
+            'transaction_date' => $this->input->post('date'),
+            'account_id' => $this->input->post('account_id'), // Bisa ganti akun
+            'receipt_image_url' => $receipt_url,
+            'item_image_url' => $item_url,
+        ];
+
+        // Update Data & Koreksi Saldo (Logic koreksi ada di Model)
+        $this->Admin_model->update_expense($id, $data, $old_data->amount);
+        
+        $this->session->set_flashdata('success', 'Transaksi berhasil diperbarui!');
+        redirect('admin/finance');
+    }
+
+    public function delete_expense($id) {
+        if ($this->Admin_model->delete_expense($id)) {
+            $this->session->set_flashdata('success', 'Transaksi dihapus & Saldo dikembalikan.');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menghapus transaksi.');
+        }
+        redirect('admin/finance');
+    }
+
+    public function get_expense_json($id) {
+        if (!$this->session->userdata('logged_in')) exit('No Access');
+        $data = $this->Admin_model->get_expense_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
+
     // ==========================================
-    // BAGIAN 2: CONTENT & LAPORAN (Orang 3 - Yanu)
+    // BAGIAN 2: CONTENT & LAPORAN (Field Coordinator)
     // ==========================================
+
     public function content() {
         if (!in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])) show_404();
 
         $data['title'] = "Content & Volunteer Dashboard";
         $data['user'] = $this->session->userdata();
         
-        // Data Reports
+        // Data Laporan Sampah
         $data['reports'] = $this->Admin_model->get_reports();
 
-        // Data Events (DENGAN JUMLAH PENDAFTAR)
+        // Data Event & Hitung Jumlah Relawan
         $events = $this->Admin_model->get_events();
-        
-        // Loop untuk menghitung pendaftar per event
         foreach ($events as &$ev) {
-            // Cek tabel volunteers (cegah error kalau tabel belum dibuat)
+            // Cek existensi tabel volunteers untuk menghindari error jika tabel belum dibuat
             if ($this->db->table_exists('volunteers')) {
                 $ev->registered_count = $this->db->where('event_id', $ev->id)->count_all_results('volunteers');
             } else {
@@ -101,12 +215,12 @@ class Admin extends CI_Controller {
         $this->load->view('layout/lay_admin', $data);
     }
 
-    // --- LOGIC VALIDASI STATUS ---
+    // Logic Update Status Laporan (Approve/Reject)
     public function update_report_status($id, $status) {
         if (!in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])) show_404();
 
+        // Validasi: Jangan reject laporan yang sedang diproses
         $current_report = $this->db->get_where('waste_reports', ['id' => $id])->row();
-
         if ($current_report) {
             if ($current_report->status == 'in_progress' && $status == 'rejected') {
                 $this->session->set_flashdata('error', 'Gagal! Laporan yang sedang diproses tidak bisa ditolak.');
@@ -121,7 +235,7 @@ class Admin extends CI_Controller {
         redirect('admin/content');
     }
 
-    // --- LOGIC SELESAIKAN LAPORAN (UPLOAD AFTER) ---
+    // Logic Selesaikan Laporan (Upload Foto After)
     public function resolve_report() {
         if (!in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])) show_404();
 
@@ -133,7 +247,7 @@ class Admin extends CI_Controller {
 
         $config['upload_path']   = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg';
-        $config['max_size']      = 10240; 
+        $config['max_size']      = 10240; // 10MB
         $config['encrypt_name']  = TRUE;
 
         $this->load->library('upload', $config);
@@ -142,8 +256,9 @@ class Admin extends CI_Controller {
 
         if ( ! $this->upload->do_upload('image_after')) {
             $error = $this->upload->display_errors();
-            $image_after = 'default_after.jpg'; 
-            $this->session->set_flashdata('error', 'Upload Warning: ' . $error);
+            $this->session->set_flashdata('error', 'Upload Gagal: ' . $error);
+            redirect('admin/content');
+            return;
         } else {
             $data = $this->upload->data();
             $image_after = $data['file_name'];
@@ -154,33 +269,31 @@ class Admin extends CI_Controller {
         redirect('admin/content');
     }
 
-        public function get_event_volunteers($event_id) {
-        // Cek Login & Role
+    // API JSON untuk melihat daftar relawan di event tertentu
+    public function get_event_volunteers($event_id) {
         if (!$this->session->userdata('logged_in')) return;
         
-        // Ambil data dari tabel volunteers
         $this->db->where('event_id', $event_id);
         $this->db->order_by('registered_at', 'DESC');
         $data = $this->db->get('volunteers')->result();
         
-        // Kirim sebagai JSON
         header('Content-Type: application/json');
         echo json_encode($data);
     }
 
+
     // ==========================================
-    // BAGIAN 3: MANAJEMEN EVENT (Orang 4 & 3)
+    // BAGIAN 3: MANAJEMEN EVENT
     // ==========================================
     
-    // --- FUNGSI ADD EVENT (Dengan Upload) ---
+    // Tambah Event Baru
     public function add_event() {
-        // Setup Upload Path
         $path = FCPATH . 'uploads/events/';
         if (!is_dir($path)) mkdir($path, 0777, true);
 
         $banner_image = null;
 
-        // Upload Logic
+        // Upload Banner Event
         if (!empty($_FILES['banner_image']['name'])) {
             $config['upload_path']   = $path;
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
@@ -188,6 +301,7 @@ class Admin extends CI_Controller {
             $config['encrypt_name']  = TRUE;
 
             $this->load->library('upload', $config);
+            $this->upload->initialize($config); // Penting jika multiple upload di satu controller
 
             if ($this->upload->do_upload('banner_image')) {
                 $upload_data = $this->upload->data();
@@ -207,20 +321,16 @@ class Admin extends CI_Controller {
         $this->Admin_model->insert_event($data);
         $this->session->set_flashdata('success', 'Event berhasil ditambahkan!');
         
+        // Redirect sesuai role
         if($this->session->userdata('role') == 'super_admin') redirect('admin/super');
         else redirect('admin/content');
     }
 
-    // --- FUNGSI EDIT EVENT (FIX 404 NOT FOUND) ---
+    // Edit Event
     public function edit_event() {
         $id = $this->input->post('event_id');
         if(!$id) show_404();
 
-        // 1. Ambil Data Lama (untuk cek foto lama jika tidak upload baru)
-        // Note: Sebaiknya buat fungsi get_event_by_id di Model, tapi kita query manual dulu biar cepet
-        $old_data = $this->db->get_where('volunteer_events', ['id' => $id])->row();
-
-        // 2. Siapkan Data Update
         $data = [
             'event_name' => $this->input->post('event_name'),
             'description' => $this->input->post('description'),
@@ -229,7 +339,7 @@ class Admin extends CI_Controller {
             'status' => $this->input->post('status')
         ];
 
-        // 3. Cek Upload Foto Baru
+        // Cek jika ada ganti banner
         if (!empty($_FILES['banner_image']['name'])) {
             $path = FCPATH . 'uploads/events/';
             if (!is_dir($path)) mkdir($path, 0777, true);
@@ -240,14 +350,14 @@ class Admin extends CI_Controller {
             $config['encrypt_name']  = TRUE;
 
             $this->load->library('upload', $config);
+            $this->upload->initialize($config);
 
             if ($this->upload->do_upload('banner_image')) {
                 $upload_data = $this->upload->data();
-                $data['banner_image_url'] = $upload_data['file_name']; // Update nama file
+                $data['banner_image_url'] = $upload_data['file_name'];
             }
         }
 
-        // 4. Update Database
         $this->db->where('id', $id);
         $this->db->update('volunteer_events', $data);
 
@@ -257,6 +367,7 @@ class Admin extends CI_Controller {
         else redirect('admin/content');
     }
 
+    // Hapus Event
     public function delete_event($id) {
         $this->Admin_model->delete_event($id);
         $this->session->set_flashdata('success', 'Event dihapus.');
@@ -264,21 +375,32 @@ class Admin extends CI_Controller {
         else redirect('admin/content');
     }
 
-    // --- (Fungsi Super Admin & Lainnya Tetap Ada di Bawah) ---
+
+    // ==========================================
+    // BAGIAN 4: SUPER ADMIN (MANAJEMEN USER)
+    // ==========================================
+
     public function super() {
         if ($this->session->userdata('role') !== 'super_admin') show_404();
+        
         $data['title'] = "Super Admin Control Panel";
         $data['user'] = $this->session->userdata();
         $data['admins'] = $this->Admin_model->get_all_admins();
+        
+        // Statistik Global
         $data['count_admin'] = count($data['admins']);
         $data['count_event'] = $this->Admin_model->get_count('volunteer_events');
         $data['count_report'] = $this->Admin_model->get_count('waste_reports');
         $data['total_fund'] = $this->Admin_model->get_balance();
+        
         $data['content'] = 'admin/super';
         $this->load->view('layout/lay_admin', $data);
     }
 
     public function add_admin() {
+        // Hanya Super Admin
+        if ($this->session->userdata('role') !== 'super_admin') redirect('admin');
+
         $data = [
             'username' => $this->input->post('username'),
             'email' => $this->input->post('email'),
@@ -291,6 +413,9 @@ class Admin extends CI_Controller {
     }
 
     public function delete_admin($id) {
+        // Hanya Super Admin
+        if ($this->session->userdata('role') !== 'super_admin') redirect('admin');
+
         if($id == $this->session->userdata('user_id')) {
             $this->session->set_flashdata('error', 'Tidak bisa menghapus diri sendiri!');
         } else {
