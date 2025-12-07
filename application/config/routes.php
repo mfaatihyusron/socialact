@@ -36,3 +36,15 @@ $route['admin/super']        = 'admin/super';        // Dashboard Orang 4 (Super
 // 5. STANDARD CI ROUTES
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+// Route Auth
+$route['login'] = 'auth/index';
+$route['auth/process'] = 'auth/process';
+$route['logout'] = 'auth/logout';
+
+// Route Admin (Secure)
+$route['admin'] = 'admin/index'; // Auto redirect sesuai role
+$route['admin/dashboard'] = 'admin/dashboard';
+$route['admin/finance'] = 'admin/finance';
+$route['admin/content'] = 'admin/content';
+$route['admin/super'] = 'admin/super';

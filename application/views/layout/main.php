@@ -60,28 +60,50 @@
 </head>
 <body class="bg-brand-black text-white font-sans antialiased selection:bg-brand-green selection:text-black">
 
-    <!-- NAVBAR MASTER (Muncul di semua halaman) -->
+    <!-- NAVBAR MASTER -->
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4 px-6 md:px-12 flex justify-between items-center backdrop-blur-sm bg-black/70 border-b border-white/10">
         <a href="<?= base_url() ?>" class="flex items-center gap-2 cursor-pointer">
             <div class="w-8 h-8 bg-white text-black flex items-center justify-center font-bold rounded-sm">P</div>
             <span class="font-heading text-xl tracking-wider font-bold uppercase">Pandawara <span class="text-brand-green">Style</span></span>
         </a>
+        
+        <!-- BAGIAN MENU YANG ANDA MINTA -->
         <div class="hidden md:flex gap-6 text-sm font-semibold tracking-wide uppercase text-gray-300">
-            <a href="<?= base_url() ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == '' ? 'text-brand-green' : '' ?>">Home</a>
-            <a href="<?= base_url('transparansi') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'transparansi' ? 'text-brand-green' : '' ?>">Transparansi</a>
-            <a href="<?= base_url('lapor') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'lapor' ? 'text-brand-green' : '' ?>">Lapor Sampah</a>
-            <a href="<?= base_url('volunteer') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'volunteer' ? 'text-brand-green' : '' ?>">Relawan</a>
+
+            <a href="<?= base_url('transparansi') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'transparansi' ? 'text-brand-green' : '' ?>">Rincian Transaksi</a>
             
-            <!-- Link ke Admin Panel (Opsional) -->
-            <a href="<?= base_url('admin/login') ?>" class="text-xs border border-gray-600 px-3 py-1 rounded hover:bg-brand-green hover:text-black hover:border-brand-green transition-all text-gray-500 font-bold uppercase">
-                <i class="fas fa-lock mr-1"></i> Admin
-            </a>
+            <a href="<?= base_url('lapor') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'lapor' ? 'text-brand-green' : '' ?>">Halaman Laporan</a>
+            
+            <a href="<?= base_url('transparansi') ?>" class="hover:text-brand-green transition-colors">Form Donasi</a>
+            
+            <a href="<?= base_url('lapor') ?>" class="hover:text-brand-green transition-colors">Form Pengaduan</a>
+            
+            <!-- Link Admin (Opsional, saya taruh di ujung kanan sebagai icon) -->
+            <a href="<?= base_url('volunteer') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'volunteer' ? 'text-brand-green' : '' ?>">Volunteer</a>
+
+            <!-- LOGIC TOMBOL LOGIN / DASHBOARD -->
+            <?php if($this->session->userdata('logged_in')): ?>
+                <!-- Jika Sudah Login: Tampilkan Tombol ke Dashboard & Logout -->
+                <div class="ml-4 flex items-center gap-2">
+                    <a href="<?= base_url('admin') ?>" class="bg-brand-green text-black px-3 py-1 rounded text-xs font-bold hover:bg-white transition-all">
+                        DASHBOARD
+                    </a>
+                    <a href="<?= base_url('logout') ?>" class="border border-red-500 text-red-500 px-3 py-1 rounded text-xs font-bold hover:bg-red-500 hover:text-white transition-all">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            <?php else: ?>
+                <!-- Jika Belum Login (Guest): Tampilkan Tombol Gembok -->
+                <a href="<?= base_url('login') ?>" class="ml-4 border border-gray-600 px-3 py-1 rounded hover:bg-brand-green hover:text-black hover:border-brand-green transition-all" title="Admin Login">
+                    <i class="fas fa-lock"></i>
+                </a>
+            <?php endif; ?>
         </div>
+        
         <button class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
     </nav>
 
     <!-- CONTENT INJECTION -->
-    <!-- Di sinilah view halaman (Home, Lapor, dll) akan dimuat -->
     <main>
         <?php $this->load->view($content); ?>
     </main>
