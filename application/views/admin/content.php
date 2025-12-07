@@ -4,7 +4,7 @@
         <p class="text-sm text-gray-400">Pilih menu di bawah untuk mengelola data.</p>
     </div>
     
-    <!-- HEADER STATS (Global) -->
+    <!-- HEADER STATS -->
     <div class="flex gap-6 bg-admin-dark px-6 py-2 rounded-full border border-gray-700">
         <div class="text-center">
             <span class="text-[10px] text-gray-500 uppercase font-bold block">Laporan</span>
@@ -18,7 +18,7 @@
     </div>
 </div>
 
-<!-- MAIN TABS (PEMISAH MENU) -->
+<!-- MAIN TABS -->
 <div class="flex border-b border-gray-700 mb-8">
     <button onclick="switchMainTab('laporan')" id="tab-btn-laporan" class="main-tab-btn active px-6 py-3 text-sm font-bold text-white border-b-2 border-brand-green hover:bg-gray-800 transition flex items-center gap-2">
         <i class="fas fa-exclamation-circle"></i> Manajemen Laporan
@@ -33,7 +33,7 @@
      ========================== -->
 <div id="content-laporan" class="tab-content">
     
-    <!-- MILESTONE FILTER LAPORAN -->
+    <!-- MILESTONE FILTER -->
     <div class="mb-3 flex items-center gap-2">
         <span class="text-[10px] uppercase font-bold text-gray-500 bg-gray-800 px-2 py-1 rounded">Filter Status:</span>
     </div>
@@ -46,32 +46,23 @@
             $rep_rejected = count(array_filter($reports, function($r){ return $r->status == 'rejected'; }));
             $rep_total = count($reports);
         ?>
-
-        <!-- Card Semua -->
+        <!-- Tombol Filter -->
         <button onclick="filterReports('all')" id="btn-all" class="filter-btn active group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-gray-800 bg-admin-dark hover:border-brand-green/50 hover:bg-gray-800 transition-all duration-300 transform hover:-translate-y-1">
             <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 group-hover:text-white transition">Semua</span>
             <h2 class="text-2xl font-heading font-bold text-white"><?= $rep_total ?></h2>
         </button>
-        
-        <!-- Card Pending -->
         <button onclick="filterReports('pending')" id="btn-pending" class="filter-btn group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-gray-800 bg-admin-dark hover:border-red-500/50 hover:bg-gray-800 transition-all duration-300 transform hover:-translate-y-1">
             <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider group-hover:text-red-400 transition">Pending</span>
             <h2 class="text-2xl font-heading font-bold text-red-500 mt-1"><?= $rep_pending ?></h2>
         </button>
-
-        <!-- Card Proses -->
         <button onclick="filterReports('in_progress')" id="btn-in_progress" class="filter-btn group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-gray-800 bg-admin-dark hover:border-yellow-500/50 hover:bg-gray-800 transition-all duration-300 transform hover:-translate-y-1">
             <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider group-hover:text-yellow-400 transition">Proses</span>
             <h2 class="text-2xl font-heading font-bold text-yellow-500 mt-1"><?= $rep_process ?></h2>
         </button>
-
-        <!-- Card Selesai -->
         <button onclick="filterReports('resolved')" id="btn-resolved" class="filter-btn group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-gray-800 bg-admin-dark hover:border-green-500/50 hover:bg-gray-800 transition-all duration-300 transform hover:-translate-y-1">
             <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider group-hover:text-green-400 transition">Selesai</span>
             <h2 class="text-2xl font-heading font-bold text-green-500 mt-1"><?= $rep_resolved ?></h2>
         </button>
-
-        <!-- Card Ditolak -->
         <button onclick="filterReports('rejected')" id="btn-rejected" class="filter-btn group flex flex-col items-center justify-center p-4 rounded-xl border-2 border-gray-800 bg-admin-dark hover:border-gray-500/50 hover:bg-gray-800 transition-all duration-300 transform hover:-translate-y-1">
             <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider group-hover:text-gray-300 transition">Ditolak</span>
             <h2 class="text-2xl font-heading font-bold text-gray-400 mt-1"><?= $rep_rejected ?></h2>
@@ -165,7 +156,7 @@
      KONTEN TAB 2: EVENT
      ========================== -->
 <div id="content-event" class="tab-content hidden">
-    <!-- Header Event & Tombol -->
+    <!-- Header Event -->
     <div class="flex justify-between items-center mb-6 bg-blue-900/10 p-6 rounded-xl border border-blue-900/30">
         <div>
             <h3 class="text-xl font-bold text-white mb-1">Manajemen Event Volunteer</h3>
@@ -184,7 +175,7 @@
         <div id="eventMap" class="w-full h-64 bg-gray-900 rounded-xl border border-gray-700 overflow-hidden shadow-inner z-0"></div>
     </div>
 
-    <!-- FILTER EVENT (NEW UI) -->
+    <!-- FILTER EVENT -->
     <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
         <button onclick="filterEvents('all')" id="ev-btn-all" class="ev-filter active px-4 py-2 bg-gray-700 text-white text-xs font-bold rounded-lg hover:bg-gray-600 transition">Semua</button>
         <button onclick="filterEvents('upcoming')" id="ev-btn-upcoming" class="ev-filter px-4 py-2 bg-admin-dark text-gray-400 border border-gray-700 text-xs font-bold rounded-lg hover:text-white hover:border-blue-500 transition">Upcoming</button>
@@ -192,7 +183,7 @@
         <button onclick="filterEvents('completed')" id="ev-btn-completed" class="ev-filter px-4 py-2 bg-admin-dark text-gray-400 border border-gray-700 text-xs font-bold rounded-lg hover:text-white hover:border-green-500 transition">Selesai</button>
     </div>
 
-    <!-- GRID EVENT (NEW UI) -->
+    <!-- GRID EVENT -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php foreach($events as $ev): 
             $now = time();
@@ -200,13 +191,12 @@
             $realStatus = $ev->status;
             if ($evtTime < ($now - 86400) && $ev->status != 'cancelled') $realStatus = 'completed';
             $evDataJson = htmlspecialchars(json_encode($ev), ENT_QUOTES, 'UTF-8');
-            $reg_count = isset($ev->registered_count) ? $ev->registered_count : 0; // Data Pendaftar
+            $reg_count = isset($ev->registered_count) ? $ev->registered_count : 0;
         ?>
         <div class="bg-admin-dark p-0 rounded-xl border border-gray-700 hover:border-blue-500/50 transition duration-300 transform hover:-translate-y-2 hover:shadow-2xl overflow-hidden group event-item flex flex-col" data-status="<?= $realStatus ?>">
             <!-- Banner Image -->
             <div class="h-40 bg-gray-800 relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent z-10"></div>
-                <!-- Cek Foto Upload -->
                 <?php 
                     $banner = (!empty($ev->banner_image_url) && file_exists(FCPATH . 'uploads/events/' . $ev->banner_image_url)) 
                         ? base_url('uploads/events/'.$ev->banner_image_url) 
@@ -218,7 +208,7 @@
                     <?= $realStatus ?>
                 </span>
 
-                <!-- OVERLAY JUMLAH PENDAFTAR DI DASHBOARD -->
+                <!-- OVERLAY JUMLAH PENDAFTAR -->
                 <div class="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 bg-black/60 backdrop-blur px-2 py-1 rounded-full border border-white/10">
                     <i class="fas fa-users text-blue-400 text-xs"></i>
                     <span class="text-[10px] font-bold text-white"><?= $reg_count ?> Relawan</span>
@@ -234,22 +224,22 @@
                         <?= date('d F Y', strtotime($ev->event_date)) ?>
                     </p>
                     <p class="text-xs text-gray-400 flex items-center">
-                        <i class="fas fa-clock w-5 text-center text-blue-500 mr-2"></i> 
-                        <?= date('H:i', strtotime($ev->event_date)) ?> WIB
-                    </p>
-                    <p class="text-xs text-gray-400 flex items-center">
                         <i class="fas fa-map-pin w-5 text-center text-blue-500 mr-2"></i> 
                         <?= $ev->location ?>
                     </p>
                 </div>
 
                 <div class="flex gap-2 pt-4 border-t border-gray-700 mt-auto">
-                    <!-- Tombol Edit -->
+                    <!-- Tombol LIHAT PENDAFTAR (BARU) -->
+                    <button onclick="openVolunteerList(<?= $ev->id ?>, '<?= addslashes($ev->event_name) ?>')" class="bg-blue-900/30 text-blue-400 py-2 px-3 rounded text-xs font-bold hover:bg-blue-900/50 transition border border-blue-900/50" title="Lihat Data Relawan">
+                        <i class="fas fa-clipboard-list"></i>
+                    </button>
+
                     <button onclick="openEditEventModal(<?= $evDataJson ?>)" class="flex-1 bg-gray-800 text-gray-300 py-2 rounded text-xs font-bold text-center hover:bg-gray-700 hover:text-white transition">
                         <i class="fas fa-edit mr-1"></i> Edit
                     </button>
                     <a href="<?= base_url('admin/delete_event/'.$ev->id) ?>" onclick="return confirm('Hapus event ini?')" class="flex-1 bg-red-900/20 text-red-400 border border-red-900/50 py-2 rounded text-xs font-bold text-center hover:bg-red-900/40 transition">
-                        <i class="fas fa-trash mr-1"></i> Hapus
+                        <i class="fas fa-trash mr-1"></i>
                     </a>
                 </div>
             </div>
@@ -265,52 +255,31 @@
     </div>
 </div>
 
-<!-- MODAL RESOLVE (LAPORAN) -->
-<div id="resolveModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
-    <div class="bg-admin-dark p-6 rounded-xl w-full max-w-md border border-gray-600 shadow-2xl transform transition-all scale-100">
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-brand-green/20 text-brand-green rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-camera text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white">Bukti Penyelesaian</h3>
-            <p class="text-xs text-gray-400">Upload foto kondisi setelah dibersihkan (After).</p>
-        </div>
+<!-- MODAL RESOLVE (Z-INDEX 9999) -->
+<div id="resolveModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[9999] backdrop-blur-sm">
+    <div class="bg-admin-dark p-6 rounded-xl w-full max-w-md border border-gray-600 shadow-2xl relative">
+        <h3 class="text-xl font-bold text-white mb-2">Bukti Penyelesaian</h3>
         
         <?= form_open_multipart('admin/resolve_report') ?>
             <input type="hidden" name="report_id" id="modal_report_id">
-            
             <div class="mb-6">
-                <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:bg-gray-800 transition cursor-pointer relative group bg-black/30">
-                    <input type="file" name="image_after" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required onchange="previewFile(event, 'preview-resolve')">
-                    <div id="upload-placeholder-resolve">
-                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-500 mb-2 group-hover:text-brand-green transition"></i>
-                        <p class="text-xs text-gray-400 group-hover:text-white">Klik atau Tarik Foto ke sini</p>
-                    </div>
-                    <img id="preview-resolve" class="hidden w-full h-32 object-cover rounded mt-2 border border-gray-600">
-                </div>
+                <input type="file" name="image_after" class="w-full bg-black border border-gray-700 p-2 rounded text-sm text-gray-300" required>
             </div>
-
             <div class="flex justify-between gap-3">
-                <button type="button" onclick="document.getElementById('resolveModal').classList.add('hidden')" class="px-4 py-2 text-gray-400 hover:text-white text-sm font-bold">Batal</button>
-                <button type="submit" class="flex-1 bg-brand-green text-black px-4 py-2.5 rounded font-bold text-sm hover:bg-white transition shadow-lg shadow-green-900/20">
-                    <i class="fas fa-check-circle mr-2"></i> Simpan & Selesai
-                </button>
+                <button type="button" onclick="document.getElementById('resolveModal').classList.add('hidden')" class="px-4 py-2 text-gray-400">Batal</button>
+                <button type="submit" class="bg-brand-green text-black px-4 py-2 rounded font-bold text-sm">Simpan</button>
             </div>
         <?= form_close() ?>
     </div>
 </div>
 
-<!-- MODAL EVENT (ADD / EDIT) -->
-<div id="eventModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[70] backdrop-blur-sm overflow-y-auto">
+<!-- MODAL EVENT (Z-INDEX 9999) -->
+<div id="eventModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-[9999] backdrop-blur-sm overflow-y-auto">
     <div class="bg-admin-dark p-0 rounded-2xl w-full max-w-4xl border border-gray-700 shadow-2xl relative overflow-hidden my-auto">
-        
-        <!-- Header Modal -->
+        <!-- Header -->
         <div class="p-6 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-1 bg-blue-500 h-6 rounded-full"></div>
-                <h3 class="text-xl font-heading font-bold text-white" id="eventModalTitle">Edit Event</h3>
-            </div>
-            <button type="button" onclick="closeEventModal()" class="text-gray-400 hover:text-white transition transform hover:rotate-90"><i class="fas fa-times text-xl"></i></button>
+            <h3 class="text-xl font-heading font-bold text-white" id="eventModalTitle">Edit Event</h3>
+            <button type="button" onclick="closeEventModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
 
         <?= form_open_multipart('admin/add_event', ['id' => 'eventForm']) ?>
@@ -318,73 +287,85 @@
             <input type="hidden" name="latitude" id="evt_lat">
             <input type="hidden" name="longitude" id="evt_lng">
 
-            <div class="p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Kiri: Data Event -->
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-xs text-gray-500 font-bold mb-2 uppercase tracking-wide">Nama Kegiatan</label>
-                            <input type="text" name="event_name" id="evt_name" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition" placeholder="Contoh: Bersih Sungai Ciliwung" required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-xs text-gray-500 font-bold mb-2 uppercase tracking-wide">Waktu Pelaksanaan</label>
-                            <input type="datetime-local" name="event_date" id="evt_date" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none transition" required>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-gray-500 font-bold mb-2 uppercase tracking-wide">Status Event</label>
-                            <div class="relative">
-                                <select name="status" id="evt_status" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none appearance-none transition">
-                                    <option value="upcoming">Upcoming (Akan Datang)</option>
-                                    <option value="ongoing">Ongoing (Sedang Berjalan)</option>
-                                    <option value="completed">Completed (Selesai)</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500"><i class="fas fa-chevron-down text-xs"></i></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-gray-500 font-bold mb-2 uppercase tracking-wide">Deskripsi</label>
-                            <textarea name="description" id="evt_desc" rows="4" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none transition" placeholder="Jelaskan detail kegiatan..."></textarea>
-                        </div>
+            <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Form Kiri -->
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs text-gray-500 font-bold mb-2 uppercase">Nama Kegiatan</label>
+                        <input type="text" name="event_name" id="evt_name" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none" required>
                     </div>
-
-                    <!-- Kanan: Map & Media -->
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-xs text-gray-500 font-bold mb-2 uppercase tracking-wide">Pilih Lokasi (Klik Peta)</label>
-                            <div class="relative rounded-lg border border-gray-700 overflow-hidden shadow-inner group">
-                                <div id="inputEventMap" class="w-full h-48 bg-gray-900 z-0"></div>
-                                <div class="absolute top-2 right-2 z-[400] bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] text-white pointer-events-none">
-                                    <i class="fas fa-map-pin text-blue-400 mr-1"></i> Klik untuk tandai
-                                </div>
-                            </div>
-                            <input type="text" name="location" id="evt_loc" placeholder="Nama Lokasi / Alamat Lengkap" class="w-full bg-black border border-gray-700 p-3 mt-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none transition" required>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-gray-500 font-bold mb-2 uppercase tracking-wide">Banner Foto (Opsional)</label>
-                            <div class="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:bg-gray-800 hover:border-blue-500 transition cursor-pointer relative group bg-black/20">
-                                <input type="file" name="banner_image" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewFile(event, 'preview-event')">
-                                <div id="upload-placeholder-event" class="flex flex-col items-center">
-                                    <i class="fas fa-image text-3xl text-gray-600 mb-2 group-hover:text-blue-500 transition"></i> 
-                                    <span class="text-xs text-gray-500 group-hover:text-white">Upload Banner</span>
-                                </div>
-                                <img id="preview-event" class="hidden absolute inset-0 w-full h-full object-cover rounded-lg">
-                            </div>
-                        </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 font-bold mb-2 uppercase">Waktu</label>
+                        <input type="datetime-local" name="event_date" id="evt_date" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 font-bold mb-2 uppercase">Status</label>
+                        <select name="status" id="evt_status" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none">
+                            <option value="upcoming">Upcoming</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 font-bold mb-2 uppercase">Deskripsi</label>
+                        <textarea name="description" id="evt_desc" rows="4" class="w-full bg-black border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none"></textarea>
+                    </div>
+                </div>
+                <!-- Form Kanan (Map) -->
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs text-gray-500 font-bold mb-2 uppercase">Pilih Lokasi (Klik Peta)</label>
+                        <div id="inputEventMap" class="w-full h-48 bg-gray-900 rounded border border-gray-700 overflow-hidden cursor-crosshair"></div>
+                        <input type="text" name="location" id="evt_loc" placeholder="Lokasi Teks" class="w-full bg-black border border-gray-700 p-3 mt-3 rounded-lg text-sm text-white focus:border-blue-500 outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 font-bold mb-2 uppercase">Banner</label>
+                        <input type="file" name="banner_image" class="w-full bg-black border border-gray-700 p-2 rounded text-sm text-gray-300">
                     </div>
                 </div>
             </div>
 
             <div class="p-6 bg-gray-800/50 border-t border-gray-700 flex justify-end gap-3">
-                <button type="button" onclick="closeEventModal()" class="px-6 py-2.5 text-gray-400 hover:text-white text-sm font-bold transition">Batal</button>
-                <button type="submit" class="bg-blue-600 text-white px-8 py-2.5 rounded-lg font-bold text-sm hover:bg-blue-500 transition shadow-lg shadow-blue-600/20 flex items-center">
-                    <i class="fas fa-save mr-2"></i> Simpan Event
-                </button>
+                <button type="button" onclick="closeEventModal()" class="px-6 py-2 text-gray-400 font-bold hover:text-white">Batal</button>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded font-bold">Simpan</button>
             </div>
         <?= form_close() ?>
+    </div>
+</div>
+
+<!-- MODAL LIST VOLUNTEER (BARU) -->
+<div id="volunteerListModal" class="fixed inset-0 bg-black/95 hidden flex items-center justify-center p-4 z-[9999] backdrop-blur-sm">
+    <div class="bg-admin-dark p-0 rounded-xl w-full max-w-3xl border border-gray-700 shadow-2xl relative flex flex-col max-h-[80vh]">
+        <div class="p-5 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold text-white uppercase"><i class="fas fa-users mr-2 text-blue-400"></i> Data Relawan</h3>
+                <p class="text-xs text-gray-400 mt-1" id="vl-event-name">Loading...</p>
+            </div>
+            <button onclick="document.getElementById('volunteerListModal').classList.add('hidden')" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        
+        <div class="overflow-auto p-0 flex-1">
+            <table class="w-full text-left text-sm text-gray-400">
+                <thead class="bg-black/50 uppercase text-xs font-bold text-gray-500 sticky top-0">
+                    <tr>
+                        <th class="p-4">Nama</th>
+                        <th class="p-4">Kontak</th>
+                        <th class="p-4">Domisili</th>
+                        <th class="p-4">Usia/JK</th>
+                        <th class="p-4 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="volunteer-table-body" class="divide-y divide-gray-800">
+                    <!-- Data Injected by JS -->
+                </tbody>
+            </table>
+            <div id="vl-loading" class="p-10 text-center text-gray-500 hidden">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Mengambil data...
+            </div>
+            <div id="vl-empty" class="p-10 text-center text-gray-500 hidden">
+                Belum ada yang mendaftar.
+            </div>
+        </div>
     </div>
 </div>
 
@@ -398,69 +379,29 @@
     function switchMainTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.getElementById('content-' + tabName).classList.remove('hidden');
-
         document.querySelectorAll('.main-tab-btn').forEach(btn => {
             btn.classList.remove('active', 'text-white', 'border-brand-green');
             btn.classList.add('text-gray-400', 'border-transparent');
         });
-
         document.getElementById('tab-btn-' + tabName).classList.add('active', 'text-white', 'border-brand-green');
         document.getElementById('tab-btn-' + tabName).classList.remove('text-gray-400', 'border-transparent');
-
         if(tabName === 'event') initEventMap();
     }
 
     function filterReports(status) {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('border-brand-green', 'border-red-500', 'border-yellow-500', 'border-green-500', 'border-gray-400');
-            btn.classList.add('border-gray-800'); 
-        });
-
+        document.querySelectorAll('.active-ring').forEach(ring => { ring.classList.remove('opacity-100'); ring.classList.add('opacity-0'); });
         const activeBtn = document.getElementById('btn-' + status);
-        if(activeBtn) {
-            activeBtn.classList.remove('border-gray-800');
-            if(status == 'all') activeBtn.classList.add('border-brand-green');
-            if(status == 'pending') activeBtn.classList.add('border-red-500');
-            if(status == 'in_progress') activeBtn.classList.add('border-yellow-500');
-            if(status == 'resolved') activeBtn.classList.add('border-green-500');
-            if(status == 'rejected') activeBtn.classList.add('border-gray-400');
-        }
-
+        if(activeBtn) { activeBtn.querySelector('.active-ring')?.classList.add('opacity-100'); activeBtn.querySelector('.active-ring')?.classList.remove('opacity-0'); }
         const items = document.querySelectorAll('.report-item');
-        items.forEach(item => {
-            if(status === 'all' || item.dataset.status === status) {
-                item.classList.remove('hidden');
-                item.classList.add('flex'); 
-            } else {
-                item.classList.add('hidden');
-                item.classList.remove('flex');
-            }
-        });
+        items.forEach(item => { if(status === 'all' || item.dataset.status === status) { item.classList.remove('hidden'); item.classList.add('flex'); } else { item.classList.add('hidden'); item.classList.remove('flex'); } });
     }
 
     function filterEvents(status) {
-        document.querySelectorAll('.ev-filter').forEach(btn => {
-            btn.classList.remove('border-blue-500', 'border-yellow-500', 'border-green-500', 'border-brand-green');
-            btn.classList.add('border-gray-800');
-        });
-
-        const activeBtn = document.getElementById('ev-btn-' + status);
-        if(activeBtn) {
-            activeBtn.classList.remove('border-gray-800');
-            if(status == 'all') activeBtn.classList.add('border-brand-green');
-            if(status == 'upcoming') activeBtn.classList.add('border-blue-500');
-            if(status == 'ongoing') activeBtn.classList.add('border-yellow-500');
-            if(status == 'completed') activeBtn.classList.add('border-green-500');
-        }
-
+        document.querySelectorAll('.ev-filter').forEach(btn => { btn.classList.remove('active', 'bg-gray-700', 'text-white'); btn.classList.add('bg-admin-dark', 'text-gray-400', 'border-gray-700'); });
+        document.getElementById('ev-btn-' + status).classList.add('active', 'bg-gray-700', 'text-white');
+        document.getElementById('ev-btn-' + status).classList.remove('bg-admin-dark', 'text-gray-400', 'border-gray-700');
         const items = document.querySelectorAll('.event-item');
-        items.forEach(item => {
-            if(status === 'all' || item.dataset.status === status) {
-                item.classList.remove('hidden');
-            } else {
-                item.classList.add('hidden');
-            }
-        });
+        items.forEach(item => { if(status === 'all' || item.dataset.status === status) { item.classList.remove('hidden'); } else { item.classList.add('hidden'); } });
     }
 
     let eventMap = null;
@@ -468,16 +409,10 @@
         if(eventMap) return; 
         setTimeout(() => { 
             eventMap = L.map('eventMap').setView([-6.2088, 106.8456], 10);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(eventMap);
-            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap' }).addTo(eventMap);
             db_events.forEach(ev => {
-                let lat = -6.2 + (Math.random() * 0.1 - 0.05);
-                let lng = 106.8 + (Math.random() * 0.1 - 0.05);
-                
-                L.marker([lat, lng]).addTo(eventMap)
-                    .bindPopup(`<b style="color:black">${ev.event_name}</b><br>${ev.location}`);
+                let lat = -6.2 + (Math.random() * 0.1 - 0.05); let lng = 106.8 + (Math.random() * 0.1 - 0.05);
+                L.marker([lat, lng]).addTo(eventMap).bindPopup(`<b style="color:black">${ev.event_name}</b><br>${ev.location}`);
             });
         }, 300);
     }
@@ -490,11 +425,6 @@
         document.getElementById('eventForm').action = "<?= base_url('admin/add_event') ?>";
         document.getElementById('eventForm').reset();
         document.getElementById('evt_id').value = ""; 
-        
-        document.getElementById('upload-placeholder-event').classList.remove('hidden');
-        document.getElementById('preview-event').classList.add('hidden');
-        document.getElementById('preview-event').src = "";
-
         document.getElementById('eventModal').classList.remove('hidden');
         initInputMap();
     }
@@ -502,23 +432,12 @@
     function openEditEventModal(data) {
         document.getElementById('eventModalTitle').innerText = "Edit Event";
         document.getElementById('eventForm').action = "<?= base_url('admin/edit_event') ?>";
-        
         document.getElementById('evt_id').value = data.id;
         document.getElementById('evt_name').value = data.event_name;
         document.getElementById('evt_date').value = data.event_date.replace(' ', 'T');
         document.getElementById('evt_status').value = data.status;
         document.getElementById('evt_loc').value = data.location;
         document.getElementById('evt_desc').value = data.description || '';
-
-        if(data.banner_image_url) {
-            document.getElementById('upload-placeholder-event').classList.add('hidden');
-            document.getElementById('preview-event').classList.remove('hidden');
-            document.getElementById('preview-event').src = "<?= base_url('uploads/events/') ?>" + data.banner_image_url;
-        } else {
-            document.getElementById('upload-placeholder-event').classList.remove('hidden');
-            document.getElementById('preview-event').classList.add('hidden');
-        }
-
         document.getElementById('eventModal').classList.remove('hidden');
         initInputMap();
     }
@@ -532,22 +451,63 @@
             if(!inputMap) {
                 inputMap = L.map('inputEventMap').setView([-6.2088, 106.8456], 11);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(inputMap);
-                
                 inputMap.on('click', function(e) {
-                    const lat = e.latlng.lat;
-                    const lng = e.latlng.lng;
-                    
-                    if(inputMarker) inputMarker.setLatLng([lat, lng]);
-                    else inputMarker = L.marker([lat, lng]).addTo(inputMap);
+                    const lat = e.latlng.lat; const lng = e.latlng.lng;
+                    if(inputMarker) inputMarker.setLatLng([lat, lng]); else inputMarker = L.marker([lat, lng]).addTo(inputMap);
+                    // document.getElementById('evt_loc').value = lat.toFixed(5) + ", " + lng.toFixed(5);
                 });
             }
             inputMap.invalidateSize(); 
         }, 300);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        filterReports('all');
-    });
+    // --- FITUR BARU: LIHAT PENDAFTAR ---
+    function openVolunteerList(eventId, eventName) {
+        const modal = document.getElementById('volunteerListModal');
+        const title = document.getElementById('vl-event-name');
+        const tbody = document.getElementById('volunteer-table-body');
+        const loading = document.getElementById('vl-loading');
+        const empty = document.getElementById('vl-empty');
+
+        title.innerText = eventName;
+        modal.classList.remove('hidden');
+        tbody.innerHTML = '';
+        loading.classList.remove('hidden');
+        empty.classList.add('hidden');
+
+        // Fetch Data via AJAX
+        fetch('<?= base_url('admin/get_event_volunteers/') ?>' + eventId)
+            .then(response => response.json())
+            .then(data => {
+                loading.classList.add('hidden');
+                if(data.length === 0) {
+                    empty.classList.remove('hidden');
+                } else {
+                    data.forEach(v => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-800/50 transition">
+                                <td class="p-4 font-bold text-white">${v.name}</td>
+                                <td class="p-4">
+                                    <div class="text-xs text-gray-300">${v.email}</div>
+                                    <div class="text-xs text-brand-green">${v.phone}</div>
+                                </td>
+                                <td class="p-4">${v.domicile}</td>
+                                <td class="p-4 text-xs">${v.age} Thn / ${v.gender}</td>
+                                <td class="p-4 text-right">
+                                    <a href="https://wa.me/${v.phone.replace(/^0/, '62')}" target="_blank" class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-500">
+                                        <i class="fab fa-whatsapp"></i> Chat
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            })
+            .catch(err => {
+                loading.classList.add('hidden');
+                alert('Gagal mengambil data.');
+            });
+    }
 
     function openResolveModal(id) {
         document.getElementById('modal_report_id').value = id;
@@ -558,7 +518,6 @@
         const input = event.target;
         const preview = document.getElementById(previewId);
         const placeholder = input.previousElementSibling; 
-
         if(input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -569,4 +528,8 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        filterReports('all');
+    });
 </script>

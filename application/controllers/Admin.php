@@ -154,6 +154,20 @@ class Admin extends CI_Controller {
         redirect('admin/content');
     }
 
+        public function get_event_volunteers($event_id) {
+        // Cek Login & Role
+        if (!$this->session->userdata('logged_in')) return;
+        
+        // Ambil data dari tabel volunteers
+        $this->db->where('event_id', $event_id);
+        $this->db->order_by('registered_at', 'DESC');
+        $data = $this->db->get('volunteers')->result();
+        
+        // Kirim sebagai JSON
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
     // ==========================================
     // BAGIAN 3: MANAJEMEN EVENT (Orang 4 & 3)
     // ==========================================
