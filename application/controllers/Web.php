@@ -6,109 +6,86 @@ class Web extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('App_model');
-        $this->load->helper(['url', 'form', 'text']);
+        $this->load->helper('url');
+        $this->load->helper('form');
         $this->load->library('session');
         $this->load->database();
     }
 
-    // 1. HALAMAN HOME
     public function index() {
         $data['title'] = "Home - SocialAct";
         $data['content'] = 'content/home'; 
         $this->load->view('layout/main', $data);
     }
 
-    // 2. HALAMAN TRANSPARANSI
     public function transparansi() {
         $data['title'] = "Transparansi Dana - SocialAct";
-        
         $data['saldo'] = $this->App_model->get_saldo();
         $data['total_masuk'] = $this->App_model->get_total_masuk();
         $data['total_keluar'] = $this->App_model->get_total_keluar();
-        
-        $data['pengeluaran'] = $this->App_model->get_all_expenses(); 
-        $data['donasi_masuk'] = $this->App_model->get_verified_donations(); 
-        
+        $data['pengeluaran'] = $this->App_model->get_all_expenses();
+        $data['donasi'] = $this->App_model->get_verified_donations();
         $data['chart_data'] = $this->App_model->get_chart_data();
-
         $data['content'] = 'content/transparansi';
         $this->load->view('layout/main', $data);
     }
 
-    // 3. HALAMAN LAPOR
     public function lapor() {
         $data['title'] = "Lapor Sampah - SocialAct";
-        $data['semua_laporan'] = $this->App_model->get_all_reports();
-        $data['laporan_selesai'] = $this->App_model->get_resolved_reports();
-
+        $data['semua_laporan'] = $this->App_model->get_all_reports(); 
+        $data['laporan_selesai'] = $this->App_model->get_resolved_reports(); 
         $data['content'] = 'content/lapor';
         $this->load->view('layout/main', $data);
     }
 
-    // --- FITUR LAPOR: SUBMIT LAPORAN (Merged: Logic Teman + Nama Method Lama) ---
-    // Nama method tetap submit_laporan agar sesuai dengan View lapor.php
-    public function submit_laporan() {
-        // Update Teman: Keamanan folder & Limit 10MB
-        $upload_path = './uploads/reports/';
-        if (!is_dir($upload_path)) {
-            mkdir($upload_path, 0777, true);
-        }
+    // --- FIX UPLOAD LAPOR (PUBLIK) ---
+    public function lapor_submit() {
+        // Fix Windows Path
+        $path = FCPATH . 'uploads/reports/';
+        if (!is_dir($path)) mkdir($path, 0777, true);
 
-        $config['upload_path']   = $upload_path;
+        $config['upload_path']   = $path; 
         $config['allowed_types'] = 'gif|jpg|png|jpeg';
-        $config['max_size']      = 10240; // 10MB
-        $config['encrypt_name']  = TRUE; 
+        $config['max_size']      = 10240; 
+        $config['encrypt_name']  = TRUE;
 
         $this->load->library('upload', $config);
 
-        if (!$this->upload->do_upload('image_before')) {
-            $this->session->set_flashdata('error', $this->upload->display_errors());
-            redirect('lapor');
+        if ( ! $this->upload->do_upload('image_before')) {
+            $file_name = 'default.jpg';
         } else {
             $upload_data = $this->upload->data();
-            $data = [
-                'reporter_name' => $this->input->post('reporter_name'),
-                'reporter_contact' => $this->input->post('reporter_contact'),
-                'location_address' => $this->input->post('location_address'),
-                'latitude' => $this->input->post('latitude'),
-                'longitude' => $this->input->post('longitude'),
-                'description' => $this->input->post('description'), 
-                'image_before_url' => 'uploads/reports/' . $upload_data['file_name'],
-                'status' => 'pending',
-                'views' => 0, // Update Teman: Init views
-                'created_at' => date('Y-m-d H:i:s')
-            ];
-            
-            if($this->App_model->insert_report($data)) {
-                $this->session->set_flashdata('success', 'Laporan berhasil dikirim! Menunggu verifikasi admin.');
-            } else {
-                $this->session->set_flashdata('error', 'Gagal menyimpan ke database.');
-            }
-            redirect('lapor');
+            $file_name = $upload_data['file_name'];
         }
-    }
 
-    // --- FITUR BARU TEMAN: Add View Count (AJAX) ---
-    public function add_view($report_id) {
-        if ($report_id) {
-            $this->App_model->increment_views($report_id);
-            echo json_encode(['status' => 'success', 'id' => $report_id]);
+        $data = [
+            'reporter_name' => $this->input->post('reporter_name'),
+            'reporter_contact' => $this->input->post('reporter_contact'),
+            'location_address' => $this->input->post('location_address'),
+            'latitude' => $this->input->post('latitude'),
+            'longitude' => $this->input->post('longitude'),
+            'description' => $this->input->post('description'),
+            'image_before_url' => $file_name,
+            'status' => 'pending',
+            'created_at' => date('Y-m-d H:i:s'),
+            'views' => 0
+        ];
+
+        if($this->App_model->insert_report($data)) {
+            $this->session->set_flashdata('success', 'Laporan berhasil dikirim! Menunggu verifikasi admin.');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal menyimpan ke database.');
         }
+        
+        redirect('web/lapor');
     }
 
-    // 4. HALAMAN FORM DONASI (Dikembalikan karena hilang di update teman)
-    public function donasi() {
-        $data['title'] = "Form Donasi - SocialAct";
-        $data['content'] = 'content/donasi';
-        $this->load->view('layout/main', $data);
-    }
-
-    // 5. PROSES SUBMIT DONASI (Dikembalikan)
+    // --- FITUR BARU TEMEN LU: SUBMIT DONASI ---
     public function submit_donasi() {
-        $upload_path = './uploads/donations/';
-        if (!is_dir($upload_path)) mkdir($upload_path, 0777, true);
+        $path = FCPATH . 'uploads/donations/';
+        if (!is_dir($path)) mkdir($path, 0777, true);
 
-        $config['upload_path']   = $upload_path;
+        $config['upload_path']   = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
         $config['max_size']      = 5120; 
         $config['encrypt_name']  = TRUE; 
@@ -118,7 +95,7 @@ class Web extends CI_Controller {
         $proof_url = null;
         if ($this->upload->do_upload('transfer_proof')) {
             $upload_data = $this->upload->data();
-            $proof_url = 'uploads/donations/' . $upload_data['file_name'];
+            $proof_url = $upload_data['file_name'];
         }
 
         $data = [
@@ -127,22 +104,26 @@ class Web extends CI_Controller {
             'amount' => $this->input->post('amount'),
             'message' => $this->input->post('message'),
             'transfer_proof_url' => $proof_url,
-            'account_id' => 1,
+            'account_id' => 1, // Default BCA
             'status' => 'pending'
         ];
 
         $this->App_model->insert_donation($data);
         $this->session->set_flashdata('success', 'Terima kasih! Donasi Anda sedang diverifikasi.');
-        redirect('donasi');
+        redirect('web/transparansi'); // Redirect ke Transparansi
     }
 
-    // 6. HALAMAN VOLUNTEER (Update Teman: Real Count)
+    public function add_view($report_id) {
+        if ($report_id) {
+            $this->App_model->increment_views($report_id);
+            echo json_encode(['status' => 'success', 'id' => $report_id]);
+        }
+    }
+
     public function volunteer() {
         $data['title'] = "Volunteer Hub - SocialAct";
         
-        $events = $this->App_model->get_upcoming_events();
-        
-        // Logika Hitung Pendaftar Real-time dari tabel volunteers
+        $events = $this->App_model->get_all_events(); 
         foreach ($events as &$ev) {
             if ($this->db->table_exists('volunteers')) {
                 $ev->registered_count = $this->db->where('event_id', $ev->id)->count_all_results('volunteers');
@@ -156,12 +137,10 @@ class Web extends CI_Controller {
         $this->load->view('layout/main', $data);
     }
 
-    // --- FITUR BARU TEMAN: Register Volunteer ---
     public function register_volunteer() {
-        // Validasi tabel exists agar tidak error
         if (!$this->db->table_exists('volunteers')) {
-            $this->session->set_flashdata('error', 'Tabel volunteers belum dibuat di database.');
-            redirect('volunteer');
+            $this->session->set_flashdata('error', 'Tabel volunteers belum dibuat.');
+            redirect('web/volunteer');
             return;
         }
 
@@ -179,11 +158,11 @@ class Web extends CI_Controller {
         ];
 
         if ($this->db->insert('volunteers', $data)) {
-            $this->session->set_flashdata('success', 'Selamat ' . $data['name'] . '! Anda berhasil terdaftar. Admin akan menghubungi via WhatsApp.');
+            $this->session->set_flashdata('success', 'Selamat ' . $data['name'] . '! Anda berhasil terdaftar.');
         } else {
             $this->session->set_flashdata('error', 'Gagal mendaftar. Silakan coba lagi.');
         }
         
-        redirect('volunteer');
+        redirect('web/volunteer');
     }
 }
