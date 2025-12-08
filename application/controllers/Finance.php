@@ -37,6 +37,55 @@ class Finance extends CI_Controller {
         $this->load->view('layout/lay_admin', $data);
     }
 
+    // ==========================================
+    // TAMBAHAN: LOGIC AKUN / REKENING
+    // ==========================================
+
+    public function add_account() {
+        $data = [
+            'account_name'        => $this->input->post('account_name'),
+            'account_type'        => $this->input->post('account_type'), // bank, ewallet, cash
+            'account_number'      => $this->input->post('account_number'),
+            'account_holder_name' => $this->input->post('account_holder_name'),
+            'current_balance'     => $this->input->post('initial_balance'),
+            'is_active'           => 1
+        ];
+
+        $this->Finance_model->insert_account($data);
+        $this->session->set_flashdata('success', 'Rekening baru berhasil ditambahkan!');
+        redirect('finance');
+    }
+
+    public function update_account_data() {
+        $id = $this->input->post('account_id');
+        $data = [
+            'account_name'        => $this->input->post('account_name'),
+            'account_type'        => $this->input->post('account_type'),
+            'account_number'      => $this->input->post('account_number'),
+            'account_holder_name' => $this->input->post('account_holder_name'),
+            // Balance tidak diupdate disini secara manual untuk menjaga konsistensi transaksi
+        ];
+
+        $this->Finance_model->update_account($id, $data);
+        $this->session->set_flashdata('success', 'Data rekening berhasil diperbarui!');
+        redirect('finance');
+    }
+
+    public function delete_account($id) {
+        // Cek apakah akun punya saldo sisa? (Opsional, tapi disini kita soft delete saja)
+        $this->Finance_model->delete_account($id);
+        $this->session->set_flashdata('success', 'Rekening berhasil dinonaktifkan.');
+        redirect('finance');
+    }
+
+    // JSON untuk Modal Edit Akun
+    public function get_account_json($id) {
+        if (!$this->session->userdata('logged_in')) exit('No Access');
+        $data = $this->Finance_model->get_account_by_id($id);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+
     public function add_transaction() {
         $type = $this->input->post('type');
         $amount = $this->input->post('amount');

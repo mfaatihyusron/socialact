@@ -85,4 +85,30 @@ class Finance_model extends CI_Model {
         }
         return false;
     }
+    // ==========================================
+    // TAMBAHAN: MANAJEMEN ACCOUNT (REKENING)
+    // ==========================================
+
+    // Ambil detail satu akun untuk Edit
+    public function get_account_by_id($id) {
+        return $this->db->get_where('accounts', ['id' => $id])->row();
+    }
+
+    // Tambah Akun Baru
+    public function insert_account($data) {
+        return $this->db->insert('accounts', $data);
+    }
+
+    // Update Data Akun
+    public function update_account($id, $data) {
+        $this->db->where('id', $id);
+        return $this->db->update('accounts', $data);
+    }
+
+    // Soft Delete Akun (Set is_active = 0) agar riwayat transaksi tidak error
+    public function delete_account($id) {
+        $this->db->set('is_active', 0);
+        $this->db->where('id', $id);
+        return $this->db->update('accounts');
+    }
 }
