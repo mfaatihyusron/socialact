@@ -224,6 +224,27 @@
                 <textarea name="description" id="edit_description" rows="2" class="w-full bg-black border border-gray-600 p-3 rounded text-white text-sm focus:border-yellow-500 outline-none"></textarea>
             </div>
 
+            <!-- Bagian Pratinjau Gambar BARU -->
+            <div class="grid grid-cols-2 gap-4 bg-gray-800/50 p-3 rounded border border-gray-700">
+                <!-- Pratinjau Struk -->
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Pratinjau Struk Lama</label>
+                    <div id="receipt_preview_container" class="h-20 bg-gray-900 rounded flex items-center justify-center overflow-hidden border border-gray-700">
+                        <img id="edit_receipt_preview" class="h-full w-full object-cover hidden">
+                        <span id="receipt_placeholder" class="text-xs text-gray-600">Tidak ada struk</span>
+                    </div>
+                </div>
+                <!-- Pratinjau Barang -->
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Pratinjau Foto Barang Lama</label>
+                    <div id="item_preview_container" class="h-20 bg-gray-900 rounded flex items-center justify-center overflow-hidden border border-gray-700">
+                        <img id="edit_item_preview" class="h-full w-full object-cover hidden">
+                        <span id="item_placeholder" class="text-xs text-gray-600">Tidak ada foto</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Akhir Bagian Pratinjau Gambar BARU -->
+
             <div class="grid grid-cols-2 gap-4 bg-gray-800/50 p-3 rounded border border-gray-700">
                 <div><label class="block text-xs text-gray-500 mb-1">Ganti Struk</label><input type="file" name="receipt_image" class="w-full text-xs text-gray-400"></div>
                 <div><label class="block text-xs text-gray-500 mb-1">Ganti Foto Barang</label><input type="file" name="item_image" class="w-full text-xs text-gray-400"></div>
@@ -255,7 +276,7 @@
     </div>
 </div>
 
-<!-- 4. MODAL EDIT AKUN (Baru Ditambahkan) -->
+<!-- 4. MODAL EDIT AKUN -->
 <div id="editAccModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
     <div class="bg-admin-dark p-6 rounded-xl w-full max-w-md border border-gray-600 shadow-2xl relative">
         <button onclick="document.getElementById('editAccModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
@@ -302,6 +323,9 @@
 </div>
 
 <script>
+    const baseUrl = '<?= base_url() ?>';
+    const uploadPath = baseUrl + 'uploads/expenses/';
+
     function toggleFields(type) {
         document.getElementById('expenseFields').classList.toggle('hidden', type !== 'out');
     }
@@ -321,11 +345,37 @@
                     document.getElementById('edit_description').value = data.description;
                     document.getElementById('edit_account_id').value = data.account_id;
                     document.getElementById('editModal').classList.remove('hidden');
+
+                    // LOGIC BARU: Tampilkan Pratinjau Gambar
+                    
+                    // Struk
+                    const receiptImg = document.getElementById('edit_receipt_preview');
+                    const receiptPlaceholder = document.getElementById('receipt_placeholder');
+                    if (data.receipt_image_url) {
+                        receiptImg.src = uploadPath + data.receipt_image_url;
+                        receiptImg.classList.remove('hidden');
+                        receiptPlaceholder.classList.add('hidden');
+                    } else {
+                        receiptImg.classList.add('hidden');
+                        receiptPlaceholder.classList.remove('hidden');
+                    }
+
+                    // Barang
+                    const itemImg = document.getElementById('edit_item_preview');
+                    const itemPlaceholder = document.getElementById('item_placeholder');
+                    if (data.item_image_url) {
+                        itemImg.src = uploadPath + data.item_image_url;
+                        itemImg.classList.remove('hidden');
+                        itemPlaceholder.classList.add('hidden');
+                    } else {
+                        itemImg.classList.add('hidden');
+                        itemPlaceholder.classList.remove('hidden');
+                    }
                 }
             });
     }
 
-    // AJAX Edit Account (Fungsi yang sebelumnya hilang)
+    // AJAX Edit Account
     function editAccount(id) {
         fetch('<?= base_url("finance/get_account_json/") ?>' + id)
             .then(res => res.json())
@@ -377,5 +427,10 @@ body {
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Memastikan elemen utama tidak meluber horizontal */
+.h-screen-full {
+     height: 100vh;
 }
 </style>

@@ -94,6 +94,7 @@ class Finance extends CI_Controller {
             $receipt_url = null;
             $item_url = null;
 
+            $this->upload->initialize($config);
             if (!empty($_FILES['receipt_image']['name'])) {
                 if ($this->upload->do_upload('receipt_image')) {
                     $receipt_url = $this->upload->data('file_name');
@@ -164,6 +165,7 @@ class Finance extends CI_Controller {
         $item_url = $old_data->item_image_url;
 
         // Cek upload baru
+        $this->upload->initialize($config);
         if (!empty($_FILES['receipt_image']['name'])) {
             if ($this->upload->do_upload('receipt_image')) {
                 $receipt_url = $this->upload->data('file_name');
