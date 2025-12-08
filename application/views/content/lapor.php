@@ -106,7 +106,7 @@
                         <div class="mb-6 bg-red-900/30 border border-red-500/50 text-red-300 p-3 rounded-xl text-xs flex items-center gap-2"><i class="fas fa-exclamation-triangle text-lg"></i> <?= $this->session->flashdata('error'); ?></div>
                     <?php endif; ?>
 
-                    <?= form_open_multipart('web/lapor_submit', ['class' => 'space-y-4 relative z-10']) ?>
+                    <?= form_open_multipart('web/submit_laporan', ['class' => 'space-y-4 relative z-10']) ?>
                         <div class="grid grid-cols-2 gap-3">
                             <div class="space-y-1"><label class="text-[10px] uppercase font-bold text-gray-500">Nama</label><input type="text" name="reporter_name" placeholder="Anonim" class="w-full bg-black/50 border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-brand-green outline-none transition"></div>
                             <div class="space-y-1"><label class="text-[10px] uppercase font-bold text-gray-500">Kontak</label><input type="text" name="reporter_contact" placeholder="08xx.." class="w-full bg-black/50 border border-gray-700 p-3 rounded-lg text-sm text-white focus:border-brand-green outline-none transition"></div>
