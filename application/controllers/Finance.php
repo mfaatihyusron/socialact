@@ -11,7 +11,6 @@ class Finance extends CI_Controller {
         $this->load->helper('form'); 
         $this->load->model('Finance_model');
 
-        // Security Check
         if (!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
@@ -24,17 +23,51 @@ class Finance extends CI_Controller {
         $data['title'] = "Finance Dashboard";
         $data['user'] = $this->session->userdata();
         
+        // Filter Tanggal Pengeluaran
+        $start_date = $this->input->get('start_date');
+        $end_date = $this->input->get('end_date');
+        $data['filter_active'] = ($start_date && $end_date);
+        $data['start_date'] = $start_date;
+        $data['end_date'] = $end_date;
+
+        // Data Utama
         $data['accounts'] = $this->Finance_model->get_all_accounts();
         $data['saldo'] = $this->Finance_model->get_total_balance();
-        $data['donasi'] = $this->Finance_model->get_recent_donations(10);
-        $data['pengeluaran'] = $this->Finance_model->get_recent_expenses(20); 
         $data['chart_data'] = $this->Finance_model->get_expense_chart_data();
+
+        // Data Tab 1: Pengeluaran (Filtered)
+        $data['pengeluaran'] = $this->Finance_model->get_expenses_filtered($start_date, $end_date);
+
+        // Data Tab 2: Donasi
+        $data['pending_donations'] = $this->Finance_model->get_pending_donations();
+        $data['history_donations'] = $this->Finance_model->get_recent_donations_history();
         
         $data['content'] = 'admin/finance';
         $this->load->view('layout/lay_admin', $data);
     }
 
-    // --- FITUR REKENING ---
+    // --- MANAJEMEN DONASI (ACC/REJECT) ---
+    public function verify_donation() {
+        $action = $this->input->post('action'); // 'approve' or 'reject'
+        $donation_id = $this->input->post('donation_id');
+        $account_id = $this->input->post('account_id'); // Rekening tujuan
+        $admin_id = $this->session->userdata('user_id');
+
+        if ($action == 'approve') {
+            if ($this->Finance_model->approve_donation($donation_id, $admin_id, $account_id)) {
+                $this->session->set_flashdata('success', 'Donasi berhasil di-ACC dan saldo ditambahkan.');
+            } else {
+                $this->session->set_flashdata('error', 'Gagal memproses donasi.');
+            }
+        } elseif ($action == 'reject') {
+            $this->Finance_model->reject_donation($donation_id, $admin_id);
+            $this->session->set_flashdata('success', 'Donasi telah ditolak.');
+        }
+
+        redirect('finance');
+    }
+
+    // --- AKUN ---
     public function add_account() {
         $data = [
             'account_name' => $this->input->post('account_name'),
@@ -72,9 +105,7 @@ class Finance extends CI_Controller {
         echo json_encode($this->Finance_model->get_account_by_id($id));
     }
 
-    // --- FITUR TRANSAKSI (ADD, EDIT, DELETE) ---
-
-    // 1. TAMBAH TRANSAKSI
+    // --- TRANSAKSI ---
     public function add_transaction() {
         $type = $this->input->post('type');
         $amount = $this->input->post('amount');
@@ -85,27 +116,18 @@ class Finance extends CI_Controller {
         if (!is_dir($path)) mkdir($path, 0777, true);
         $config['upload_path']   = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
-        $config['max_size']      = 5120; // 5MB
+        $config['max_size']      = 5120;
         $config['encrypt_name']  = TRUE;
         $this->load->library('upload', $config);
 
         if ($type == 'out') {
-            // Logic Pengeluaran
-            $receipt_url = null;
-            $item_url = null;
-
-            $this->upload->initialize($config);
+            $receipt_url = null; $item_url = null;
             if (!empty($_FILES['receipt_image']['name'])) {
-                if ($this->upload->do_upload('receipt_image')) {
-                    $receipt_url = $this->upload->data('file_name');
-                }
+                if ($this->upload->do_upload('receipt_image')) $receipt_url = $this->upload->data('file_name');
             }
-            // Reset upload lib untuk file kedua
             $this->upload->initialize($config);
             if (!empty($_FILES['item_image']['name'])) {
-                if ($this->upload->do_upload('item_image')) {
-                    $item_url = $this->upload->data('file_name');
-                }
+                if ($this->upload->do_upload('item_image')) $item_url = $this->upload->data('file_name');
             }
 
             $data = [
@@ -121,14 +143,12 @@ class Finance extends CI_Controller {
                 'created_at' => date('Y-m-d H:i:s')
             ];
             $this->Finance_model->insert_expense($data);
-
         } else {
-            // Logic Pemasukan (Manual)
             $data = [
                 'donor_name' => 'Manual Input (Admin)',
-                'donor_email' => $this->session->userdata('email') ?: 'admin@sistem',
+                'donor_email' => 'admin@local',
                 'amount' => $amount,
-                'message' => $this->input->post('title'), // Judul jadi pesan
+                'message' => $this->input->post('title'),
                 'account_id' => $account_id,
                 'status' => 'verified',
                 'verified_by' => $this->session->userdata('user_id'),
@@ -137,43 +157,31 @@ class Finance extends CI_Controller {
             ];
             $this->Finance_model->insert_income_manual($data);
         }
-
         $this->session->set_flashdata('success', 'Transaksi berhasil disimpan!');
         redirect('finance');
     }
 
-    // 2. EDIT PENGELUARAN
     public function update_expense() {
         $id = $this->input->post('expense_id');
         $old_data = $this->Finance_model->get_expense_by_id($id);
-        
-        if(!$old_data) {
-            show_404();
-            return;
-        }
+        if(!$old_data) show_404();
 
-        // Config Upload sama seperti add
         $path = FCPATH . 'uploads/expenses/';
-        $config['upload_path']   = $path;
+        $config['upload_path'] = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
-        $config['max_size']      = 5120;
-        $config['encrypt_name']  = TRUE;
+        $config['max_size'] = 5120;
+        $config['encrypt_name'] = TRUE;
         $this->load->library('upload', $config);
 
-        // Pakai gambar lama dulu
         $receipt_url = $old_data->receipt_image_url;
         $item_url = $old_data->item_image_url;
 
-        // Cek upload baru
-        $this->upload->initialize($config);
         if (!empty($_FILES['receipt_image']['name'])) {
             if ($this->upload->do_upload('receipt_image')) {
                 $receipt_url = $this->upload->data('file_name');
-                // Hapus file lama jika ada (opsional)
                 if($old_data->receipt_image_url && file_exists($path.$old_data->receipt_image_url)) unlink($path.$old_data->receipt_image_url);
             }
         }
-        
         $this->upload->initialize($config);
         if (!empty($_FILES['item_image']['name'])) {
             if ($this->upload->do_upload('item_image')) {
@@ -192,18 +200,14 @@ class Finance extends CI_Controller {
             'receipt_image_url' => $receipt_url,
             'item_image_url' => $item_url,
         ];
-
-        // Panggil Model (Otomatis handle saldo)
         $this->Finance_model->update_expense($id, $data);
-        
-        $this->session->set_flashdata('success', 'Transaksi diperbarui, saldo rekening disesuaikan.');
+        $this->session->set_flashdata('success', 'Transaksi diperbarui, saldo disesuaikan.');
         redirect('finance');
     }
 
-    // 3. HAPUS PENGELUARAN
     public function delete_expense($id) {
         if ($this->Finance_model->delete_expense($id)) {
-            $this->session->set_flashdata('success', 'Transaksi dihapus & dana dikembalikan ke rekening.');
+            $this->session->set_flashdata('success', 'Transaksi dihapus & dana dikembalikan.');
         } else {
             $this->session->set_flashdata('error', 'Gagal menghapus transaksi.');
         }
