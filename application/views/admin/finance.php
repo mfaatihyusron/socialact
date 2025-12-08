@@ -6,7 +6,7 @@
     <div class="flex gap-3">
         <!-- Tombol Tambah Rekening -->
         <button onclick="document.getElementById('accModal').classList.remove('hidden')" class="bg-gray-800 border border-gray-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-gray-700 transition text-sm flex items-center shadow-lg">
-            <i class="fas fa-university mr-2 text-blue-400"></i> Kelola Rekening
+            <i class="fas fa-university mr-2 text-blue-400"></i> Tambah Rekening
         </button>
         <!-- Tombol Input Transaksi -->
         <button onclick="openAddModal()" class="bg-brand-green text-black font-bold px-6 py-2 rounded-lg shadow-lg shadow-green-900/50 hover:bg-white transition flex items-center">
