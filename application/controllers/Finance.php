@@ -9,20 +9,17 @@ class Finance extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form'); 
-        $this->load->model('Finance_model'); // Load Finance Model baru
+        $this->load->model('Finance_model');
 
-        // Cek Login dan Role
+        // Security Check
         if (!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
         if (!in_array($this->session->userdata('role'), ['finance', 'super_admin'])) {
-            show_404(); // Hanya boleh diakses oleh Finance & Super Admin
+            show_404(); 
         }
     }
 
-    // ==========================================
-    // BAGIAN 1: FINANCE DASHBOARD
-    // ==========================================
     public function index() {
         $data['title'] = "Finance Dashboard";
         $data['user'] = $this->session->userdata();
@@ -37,82 +34,76 @@ class Finance extends CI_Controller {
         $this->load->view('layout/lay_admin', $data);
     }
 
-    // ==========================================
-    // TAMBAHAN: LOGIC AKUN / REKENING
-    // ==========================================
-
+    // --- FITUR REKENING ---
     public function add_account() {
         $data = [
-            'account_name'        => $this->input->post('account_name'),
-            'account_type'        => $this->input->post('account_type'), // bank, ewallet, cash
-            'account_number'      => $this->input->post('account_number'),
+            'account_name' => $this->input->post('account_name'),
+            'account_type' => $this->input->post('account_type'),
+            'account_number' => $this->input->post('account_number'),
             'account_holder_name' => $this->input->post('account_holder_name'),
-            'current_balance'     => $this->input->post('initial_balance'),
-            'is_active'           => 1
+            'current_balance' => $this->input->post('initial_balance'),
+            'is_active' => 1
         ];
-
         $this->Finance_model->insert_account($data);
-        $this->session->set_flashdata('success', 'Rekening baru berhasil ditambahkan!');
+        $this->session->set_flashdata('success', 'Rekening berhasil ditambahkan');
         redirect('finance');
     }
 
     public function update_account_data() {
         $id = $this->input->post('account_id');
         $data = [
-            'account_name'        => $this->input->post('account_name'),
-            'account_type'        => $this->input->post('account_type'),
-            'account_number'      => $this->input->post('account_number'),
-            'account_holder_name' => $this->input->post('account_holder_name'),
-            // Balance tidak diupdate disini secara manual untuk menjaga konsistensi transaksi
+            'account_name' => $this->input->post('account_name'),
+            'account_type' => $this->input->post('account_type'),
+            'account_number' => $this->input->post('account_number'),
+            'account_holder_name' => $this->input->post('account_holder_name')
         ];
-
         $this->Finance_model->update_account($id, $data);
-        $this->session->set_flashdata('success', 'Data rekening berhasil diperbarui!');
+        $this->session->set_flashdata('success', 'Rekening berhasil diupdate');
         redirect('finance');
     }
 
     public function delete_account($id) {
-        // Cek apakah akun punya saldo sisa? (Opsional, tapi disini kita soft delete saja)
         $this->Finance_model->delete_account($id);
-        $this->session->set_flashdata('success', 'Rekening berhasil dinonaktifkan.');
+        $this->session->set_flashdata('success', 'Rekening dinonaktifkan');
         redirect('finance');
     }
 
-    // JSON untuk Modal Edit Akun
     public function get_account_json($id) {
-        if (!$this->session->userdata('logged_in')) exit('No Access');
-        $data = $this->Finance_model->get_account_by_id($id);
-        header('Content-Type: application/json');
-        echo json_encode($data);
+        echo json_encode($this->Finance_model->get_account_by_id($id));
     }
 
+    // --- FITUR TRANSAKSI (ADD, EDIT, DELETE) ---
+
+    // 1. TAMBAH TRANSAKSI
     public function add_transaction() {
         $type = $this->input->post('type');
         $amount = $this->input->post('amount');
         $account_id = $this->input->post('account_id');
 
-        if ($type == 'out') {
-            $path = FCPATH . 'uploads/expenses/';
-            if (!is_dir($path)) mkdir($path, 0777, true);
-            $config['upload_path']   = $path;
-            $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
-            $config['max_size']      = 5120; 
-            $config['encrypt_name']  = TRUE;
-            $this->load->library('upload', $config);
+        // Config Upload
+        $path = FCPATH . 'uploads/expenses/';
+        if (!is_dir($path)) mkdir($path, 0777, true);
+        $config['upload_path']   = $path;
+        $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
+        $config['max_size']      = 5120; // 5MB
+        $config['encrypt_name']  = TRUE;
+        $this->load->library('upload', $config);
 
+        if ($type == 'out') {
+            // Logic Pengeluaran
             $receipt_url = null;
             $item_url = null;
+
             if (!empty($_FILES['receipt_image']['name'])) {
                 if ($this->upload->do_upload('receipt_image')) {
-                    $up = $this->upload->data();
-                    $receipt_url = $up['file_name'];
+                    $receipt_url = $this->upload->data('file_name');
                 }
             }
-            $this->upload->initialize($config); 
+            // Reset upload lib untuk file kedua
+            $this->upload->initialize($config);
             if (!empty($_FILES['item_image']['name'])) {
                 if ($this->upload->do_upload('item_image')) {
-                    $up = $this->upload->data();
-                    $item_url = $up['file_name'];
+                    $item_url = $this->upload->data('file_name');
                 }
             }
 
@@ -125,20 +116,23 @@ class Finance extends CI_Controller {
                 'account_id' => $account_id,
                 'receipt_image_url' => $receipt_url,
                 'item_image_url' => $item_url,
-                'created_by' => $this->session->userdata('user_id')
+                'created_by' => $this->session->userdata('user_id'),
+                'created_at' => date('Y-m-d H:i:s')
             ];
             $this->Finance_model->insert_expense($data);
 
         } else {
+            // Logic Pemasukan (Manual)
             $data = [
                 'donor_name' => 'Manual Input (Admin)',
-                'donor_email' => 'admin@local',
+                'donor_email' => $this->session->userdata('email') ?: 'admin@sistem',
                 'amount' => $amount,
-                'message' => $this->input->post('title'),
+                'message' => $this->input->post('title'), // Judul jadi pesan
                 'account_id' => $account_id,
                 'status' => 'verified',
                 'verified_by' => $this->session->userdata('user_id'),
-                'verified_at' => date('Y-m-d H:i:s')
+                'verified_at' => date('Y-m-d H:i:s'),
+                'created_at' => date('Y-m-d H:i:s')
             ];
             $this->Finance_model->insert_income_manual($data);
         }
@@ -147,33 +141,42 @@ class Finance extends CI_Controller {
         redirect('finance');
     }
 
+    // 2. EDIT PENGELUARAN
     public function update_expense() {
         $id = $this->input->post('expense_id');
         $old_data = $this->Finance_model->get_expense_by_id($id);
-        if(!$old_data) show_404();
+        
+        if(!$old_data) {
+            show_404();
+            return;
+        }
 
+        // Config Upload sama seperti add
         $path = FCPATH . 'uploads/expenses/';
-        if (!is_dir($path)) mkdir($path, 0777, true);
         $config['upload_path']   = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
         $config['max_size']      = 5120;
         $config['encrypt_name']  = TRUE;
         $this->load->library('upload', $config);
 
+        // Pakai gambar lama dulu
         $receipt_url = $old_data->receipt_image_url;
         $item_url = $old_data->item_image_url;
 
+        // Cek upload baru
         if (!empty($_FILES['receipt_image']['name'])) {
             if ($this->upload->do_upload('receipt_image')) {
-                $up = $this->upload->data();
-                $receipt_url = $up['file_name'];
+                $receipt_url = $this->upload->data('file_name');
+                // Hapus file lama jika ada (opsional)
+                if($old_data->receipt_image_url && file_exists($path.$old_data->receipt_image_url)) unlink($path.$old_data->receipt_image_url);
             }
         }
+        
         $this->upload->initialize($config);
         if (!empty($_FILES['item_image']['name'])) {
             if ($this->upload->do_upload('item_image')) {
-                $up = $this->upload->data();
-                $item_url = $up['file_name'];
+                $item_url = $this->upload->data('file_name');
+                if($old_data->item_image_url && file_exists($path.$old_data->item_image_url)) unlink($path.$old_data->item_image_url);
             }
         }
 
@@ -188,14 +191,17 @@ class Finance extends CI_Controller {
             'item_image_url' => $item_url,
         ];
 
-        $this->Finance_model->update_expense($id, $data, $old_data->amount);
-        $this->session->set_flashdata('success', 'Transaksi berhasil diperbarui!');
+        // Panggil Model (Otomatis handle saldo)
+        $this->Finance_model->update_expense($id, $data);
+        
+        $this->session->set_flashdata('success', 'Transaksi diperbarui, saldo rekening disesuaikan.');
         redirect('finance');
     }
 
+    // 3. HAPUS PENGELUARAN
     public function delete_expense($id) {
         if ($this->Finance_model->delete_expense($id)) {
-            $this->session->set_flashdata('success', 'Transaksi dihapus & Saldo dikembalikan.');
+            $this->session->set_flashdata('success', 'Transaksi dihapus & dana dikembalikan ke rekening.');
         } else {
             $this->session->set_flashdata('error', 'Gagal menghapus transaksi.');
         }
@@ -203,7 +209,6 @@ class Finance extends CI_Controller {
     }
 
     public function get_expense_json($id) {
-        if (!$this->session->userdata('logged_in')) exit('No Access');
         $data = $this->Finance_model->get_expense_by_id($id);
         header('Content-Type: application/json');
         echo json_encode($data);
