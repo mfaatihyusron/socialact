@@ -58,29 +58,39 @@ class Content extends CI_Controller {
 
     public function resolve_report() {
         $report_id = $this->input->post('report_id');
-        
+
+        // Use same format as working event upload
         $path = FCPATH . 'uploads/reports/';
         if (!is_dir($path)) mkdir($path, 0777, true);
-        
+
+        log_message('debug', 'FCPATH: ' . FCPATH);
+        log_message('debug', 'Upload path: ' . $path);
+        log_message('debug', 'is_dir($path): ' . (is_dir($path) ? 'true' : 'false'));
+        log_message('debug', 'is_writable($path): ' . (is_writable($path) ? 'true' : 'false'));
+
         $config['upload_path'] = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg';
         $config['max_size'] = 10240;
         $config['encrypt_name'] = TRUE;
-        
+
         $this->load->library('upload', $config);
-        
+        $this->upload->initialize($config);
+
         $image_after = null; // Ubah default menjadi null
         if ($this->upload->do_upload('image_after')) {
             $data = $this->upload->data();
             $image_after = $data['file_name'];
-            
+            log_message('info', 'Upload successful in resolve_report: ' . $image_after);
+
             $this->Content_model->update_report_status($report_id, 'resolved', $image_after);
             $this->session->set_flashdata('success', 'Laporan selesai! Foto berhasil diupload.');
         } else {
             $error = $this->upload->display_errors();
+            log_message('error', 'Upload failed in resolve_report: ' . $error);
+            log_message('error', 'Config used: ' . json_encode($config));
             // Jika upload gagal, status tetap resolved, tapi foto after null (atau gunakan default jika ada)
-            $this->Content_model->update_report_status($report_id, 'resolved', $image_after); 
-            $this->session->set_flashdata('warning', 'Laporan selesai, tapi upload foto gagal: ' . $error);
+            $this->Content_model->update_report_status($report_id, 'resolved', $image_after);
+            $this->session->set_flashdata('error', 'Laporan selesai, tapi upload foto gagal: ' . $error);
         }
 
         redirect('content');
