@@ -41,14 +41,14 @@
 
             <!-- MENU UNTUK FINANCE & SUPER -->
             <?php if(in_array($this->session->userdata('role'), ['finance', 'super_admin'])): ?>
-                <a href="<?= base_url('admin/finance') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(2) == 'finance' ? 'bg-gray-800 text-brand-green' : '' ?>">
+                <a href="<?= base_url('finance') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(2) == 'finance' ? 'bg-gray-800 text-brand-green' : '' ?>">
                     <i class="fas fa-wallet w-5"></i> Keuangan
                 </a>
             <?php endif; ?>
 
             <!-- MENU UNTUK CONTENT & SUPER -->
             <?php if(in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])): ?>
-                <a href="<?= base_url('admin/content') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(2) == 'content' ? 'bg-gray-800 text-brand-green' : '' ?>">
+                <a href="<?= base_url('content') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(2) == 'content' ? 'bg-gray-800 text-brand-green' : '' ?>">
                     <i class="fas fa-map-marked-alt w-5"></i> Content & Laporan
                 </a>
             <?php endif; ?>
