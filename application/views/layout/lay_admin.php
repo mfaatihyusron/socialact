@@ -18,6 +18,35 @@
             }
         }
     </script>
+    <!-- CSS untuk menghilangkan scrollbar yang tidak perlu (solusi global) -->
+    <style>
+        /* Memastikan body tidak ada scrollbar, terutama horizontal */
+        body {
+            overflow-x: hidden !important;
+            overflow-y: auto; /* Tetap izinkan scroll vertikal */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        /* Menyembunyikan scrollbar di Webkit (Chrome, Safari, dll.) */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Menyembunyikan scrollbar di elemen tertentu */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Memastikan elemen utama tidak meluber horizontal */
+        .h-screen-full {
+             height: 100vh;
+        }
+    </style>
 </head>
 <body class="bg-brand-black text-gray-300 font-sans flex h-screen overflow-hidden">
 
@@ -41,14 +70,14 @@
 
             <!-- MENU UNTUK FINANCE & SUPER -->
             <?php if(in_array($this->session->userdata('role'), ['finance', 'super_admin'])): ?>
-                <a href="<?= base_url('finance') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(2) == 'finance' ? 'bg-gray-800 text-brand-green' : '' ?>">
+                <a href="<?= base_url('finance') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(1) == 'finance' ? 'bg-gray-800 text-brand-green' : '' ?>">
                     <i class="fas fa-wallet w-5"></i> Keuangan
                 </a>
             <?php endif; ?>
 
             <!-- MENU UNTUK CONTENT & SUPER -->
             <?php if(in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])): ?>
-                <a href="<?= base_url('content') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(2) == 'content' ? 'bg-gray-800 text-brand-green' : '' ?>">
+                <a href="<?= base_url('content') ?>" class="flex items-center gap-3 px-4 py-3 rounded text-sm hover:bg-gray-800 <?= $this->uri->segment(1) == 'content' ? 'bg-gray-800 text-brand-green' : '' ?>">
                     <i class="fas fa-map-marked-alt w-5"></i> Content & Laporan
                 </a>
             <?php endif; ?>
