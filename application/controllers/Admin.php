@@ -11,13 +11,12 @@ class Admin extends CI_Controller {
         $this->load->helper('form'); 
         $this->load->model('Admin_model');
 
-        // Cek Login untuk semua fungsi di controller ini
+        // Cek Login
         if (!$this->session->userdata('logged_in')) {
             redirect('auth');
         }
     }
 
-    // Redirect Dashboard sesuai Role saat akses /admin
     public function index() {
         $role = $this->session->userdata('role');
         if ($role == 'finance') redirect('admin/finance');
@@ -26,16 +25,15 @@ class Admin extends CI_Controller {
     }
 
     // ==========================================
-    // BAGIAN 1: FINANCE DASHBOARD & LOGIC
+    // BAGIAN 1: FINANCE DASHBOARD (GABUNGAN)
     // ==========================================
-    
     public function finance() {
         if (!in_array($this->session->userdata('role'), ['finance', 'super_admin'])) show_404();
 
         $data['title'] = "Finance Dashboard";
         $data['user'] = $this->session->userdata();
         
-        // LOAD ACCOUNTS UNTUK DROPDOWN
+        // Data Akun (Dari Temen Lu)
         $data['accounts'] = $this->Admin_model->get_all_accounts();
 
         $data['saldo'] = $this->Admin_model->get_balance();
@@ -44,18 +42,16 @@ class Admin extends CI_Controller {
         $data['chart_data'] = $this->Admin_model->get_expense_chart_data();
         
         $data['content'] = 'admin/finance';
-        $this->load->view('layout/lay_admin', $data);
+        $this->load->view('layout/admin', $data);
     }
 
     public function add_transaction() {
         $type = $this->input->post('type');
         $amount = $this->input->post('amount');
-        
-        // AMBIL ACCOUNT_ID DARI INPUT FORM
-        $account_id = $this->input->post('account_id');
+        $account_id = $this->input->post('account_id'); // Ambil ID Akun
 
         if ($type == 'out') {
-            // Upload Config
+            // --- FIX UPLOAD FINANCE (ANTI MACET) ---
             $path = FCPATH . 'uploads/expenses/';
             if (!is_dir($path)) mkdir($path, 0777, true);
 
@@ -69,6 +65,7 @@ class Admin extends CI_Controller {
             $receipt_url = null;
             $item_url = null;
 
+            // Upload Struk
             if (!empty($_FILES['receipt_image']['name'])) {
                 if ($this->upload->do_upload('receipt_image')) {
                     $up = $this->upload->data();
@@ -76,6 +73,7 @@ class Admin extends CI_Controller {
                 }
             }
 
+            // Upload Barang (Reset Config)
             $this->upload->initialize($config); 
             if (!empty($_FILES['item_image']['name'])) {
                 if ($this->upload->do_upload('item_image')) {
@@ -90,28 +88,26 @@ class Admin extends CI_Controller {
                 'amount' => $amount,
                 'category' => $this->input->post('category'),
                 'transaction_date' => $this->input->post('date'),
-                'account_id' => $account_id, // Gunakan ID akun yang dipilih
+                'account_id' => $account_id,
                 'receipt_image_url' => $receipt_url,
                 'item_image_url' => $item_url,
                 'created_by' => $this->session->userdata('user_id')
             ];
             
-            // Model insert_expense akan otomatis memotong saldo akun ID ini
             $this->Admin_model->insert_expense($data);
 
         } else {
-            // Pemasukan
+            // Pemasukan Manual
             $data = [
                 'donor_name' => 'Manual Input (Admin)',
                 'donor_email' => 'admin@local',
                 'amount' => $amount,
                 'message' => $this->input->post('title'),
-                'account_id' => $account_id, // Gunakan ID akun yang dipilih
+                'account_id' => $account_id,
                 'status' => 'verified',
                 'verified_by' => $this->session->userdata('user_id'),
                 'verified_at' => date('Y-m-d H:i:s')
             ];
-            // Model insert_income akan otomatis menambah saldo akun ID ini
             $this->Admin_model->insert_income_manual($data);
         }
 
@@ -119,14 +115,16 @@ class Admin extends CI_Controller {
         redirect('admin/finance');
     }
 
+    // --- FITUR BARU TEMEN LU: UPDATE EXPENSE ---
     public function update_expense() {
         $id = $this->input->post('expense_id');
-        
         $old_data = $this->Admin_model->get_expense_by_id($id);
         if(!$old_data) show_404();
 
-        // Config Upload
+        // Fix Upload Edit
         $path = FCPATH . 'uploads/expenses/';
+        if (!is_dir($path)) mkdir($path, 0777, true);
+        
         $config['upload_path']   = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf';
         $config['max_size']      = 5120;
@@ -157,18 +155,17 @@ class Admin extends CI_Controller {
             'amount' => $this->input->post('amount'),
             'category' => $this->input->post('category'),
             'transaction_date' => $this->input->post('date'),
-            'account_id' => $this->input->post('account_id'), // Bisa ganti akun
+            'account_id' => $this->input->post('account_id'),
             'receipt_image_url' => $receipt_url,
             'item_image_url' => $item_url,
         ];
 
-        // Update Data & Koreksi Saldo (Logic koreksi ada di Model)
         $this->Admin_model->update_expense($id, $data, $old_data->amount);
-        
         $this->session->set_flashdata('success', 'Transaksi berhasil diperbarui!');
         redirect('admin/finance');
     }
 
+    // --- FITUR BARU TEMEN LU: DELETE EXPENSE ---
     public function delete_expense($id) {
         if ($this->Admin_model->delete_expense($id)) {
             $this->session->set_flashdata('success', 'Transaksi dihapus & Saldo dikembalikan.');
@@ -185,24 +182,18 @@ class Admin extends CI_Controller {
         echo json_encode($data);
     }
 
-
     // ==========================================
-    // BAGIAN 2: CONTENT & LAPORAN (Field Coordinator)
+    // BAGIAN 2: CONTENT & LAPORAN
     // ==========================================
-
     public function content() {
         if (!in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])) show_404();
 
         $data['title'] = "Content & Volunteer Dashboard";
         $data['user'] = $this->session->userdata();
-        
-        // Data Laporan Sampah
         $data['reports'] = $this->Admin_model->get_reports();
 
-        // Data Event & Hitung Jumlah Relawan
         $events = $this->Admin_model->get_events();
         foreach ($events as &$ev) {
-            // Cek existensi tabel volunteers untuk menghindari error jika tabel belum dibuat
             if ($this->db->table_exists('volunteers')) {
                 $ev->registered_count = $this->db->where('event_id', $ev->id)->count_all_results('volunteers');
             } else {
@@ -212,96 +203,73 @@ class Admin extends CI_Controller {
         $data['events'] = $events;
 
         $data['content'] = 'admin/content';
-        $this->load->view('layout/lay_admin', $data);
+        $this->load->view('layout/admin', $data);
     }
 
-    // Logic Update Status Laporan (Approve/Reject)
     public function update_report_status($id, $status) {
         if (!in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])) show_404();
-
-        // Validasi: Jangan reject laporan yang sedang diproses
+        
         $current_report = $this->db->get_where('waste_reports', ['id' => $id])->row();
-        if ($current_report) {
-            if ($current_report->status == 'in_progress' && $status == 'rejected') {
-                $this->session->set_flashdata('error', 'Gagal! Laporan yang sedang diproses tidak bisa ditolak.');
-                redirect('admin/content');
-                return;
-            }
+        if ($current_report && $current_report->status == 'in_progress' && $status == 'rejected') {
+            $this->session->set_flashdata('error', 'Gagal! Laporan yang sedang diproses tidak bisa ditolak.');
+            redirect('admin/content');
+            return;
         }
 
         $this->Admin_model->update_report_status($id, $status, null);
-        $msg = ($status == 'rejected') ? 'Laporan ditolak.' : 'Status laporan diupdate menjadi: ' . $status;
-        $this->session->set_flashdata('success', $msg);
+        $this->session->set_flashdata('success', 'Status laporan diperbarui.');
         redirect('admin/content');
     }
 
-    // Logic Selesaikan Laporan (Upload Foto After)
     public function resolve_report() {
         if (!in_array($this->session->userdata('role'), ['field_coordinator', 'super_admin'])) show_404();
-
+        
         $report_id = $this->input->post('report_id');
-
-        // Config Upload
+        
+        // Fix Upload Windows
         $path = FCPATH . 'uploads/reports/';
         if (!is_dir($path)) mkdir($path, 0777, true);
-
-        $config['upload_path']   = $path;
+        
+        $config['upload_path'] = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg';
-        $config['max_size']      = 10240; // 10MB
-        $config['encrypt_name']  = TRUE;
-
+        $config['max_size'] = 10240;
+        $config['encrypt_name'] = TRUE;
+        
         $this->load->library('upload', $config);
-
-        $image_after = null;
-
-        if ( ! $this->upload->do_upload('image_after')) {
-            $error = $this->upload->display_errors();
-            $this->session->set_flashdata('error', 'Upload Gagal: ' . $error);
-            redirect('admin/content');
-            return;
-        } else {
+        
+        $image_after = 'default_after.jpg';
+        if ($this->upload->do_upload('image_after')) {
             $data = $this->upload->data();
             $image_after = $data['file_name'];
+            
+            $this->Admin_model->update_report_status($report_id, 'resolved', $image_after);
+            $this->session->set_flashdata('success', 'Laporan selesai! Foto berhasil diupload.');
+        } else {
+            $error = $this->upload->display_errors();
+            $this->Admin_model->update_report_status($report_id, 'resolved', $image_after);
+            $this->session->set_flashdata('warning', 'Laporan selesai, tapi upload foto gagal: ' . $error);
         }
 
-        $this->Admin_model->update_report_status($report_id, 'resolved', $image_after);
-        $this->session->set_flashdata('success', 'Laporan selesai! Slider Before-After berhasil dibuat.');
         redirect('admin/content');
     }
-
-    // API JSON untuk melihat daftar relawan di event tertentu
-    public function get_event_volunteers($event_id) {
-        if (!$this->session->userdata('logged_in')) return;
-        
-        $this->db->where('event_id', $event_id);
-        $this->db->order_by('registered_at', 'DESC');
-        $data = $this->db->get('volunteers')->result();
-        
-        header('Content-Type: application/json');
-        echo json_encode($data);
-    }
-
 
     // ==========================================
     // BAGIAN 3: MANAJEMEN EVENT
     // ==========================================
-    
-    // Tambah Event Baru
     public function add_event() {
         $path = FCPATH . 'uploads/events/';
         if (!is_dir($path)) mkdir($path, 0777, true);
 
         $banner_image = null;
 
-        // Upload Banner Event
         if (!empty($_FILES['banner_image']['name'])) {
-            $config['upload_path']   = $path;
+            $config['upload_path'] = $path;
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
-            $config['max_size']      = 5000;
-            $config['encrypt_name']  = TRUE;
+            $config['max_size'] = 5000;
+            $config['encrypt_name'] = TRUE;
 
             $this->load->library('upload', $config);
-            $this->upload->initialize($config); // Penting jika multiple upload di satu controller
+            $this->upload->initialize($config);
 
             if ($this->upload->do_upload('banner_image')) {
                 $upload_data = $this->upload->data();
@@ -321,12 +289,10 @@ class Admin extends CI_Controller {
         $this->Admin_model->insert_event($data);
         $this->session->set_flashdata('success', 'Event berhasil ditambahkan!');
         
-        // Redirect sesuai role
         if($this->session->userdata('role') == 'super_admin') redirect('admin/super');
         else redirect('admin/content');
     }
 
-    // Edit Event
     public function edit_event() {
         $id = $this->input->post('event_id');
         if(!$id) show_404();
@@ -339,15 +305,14 @@ class Admin extends CI_Controller {
             'status' => $this->input->post('status')
         ];
 
-        // Cek jika ada ganti banner
         if (!empty($_FILES['banner_image']['name'])) {
             $path = FCPATH . 'uploads/events/';
             if (!is_dir($path)) mkdir($path, 0777, true);
 
-            $config['upload_path']   = $path;
+            $config['upload_path'] = $path;
             $config['allowed_types'] = 'gif|jpg|png|jpeg';
-            $config['max_size']      = 5000;
-            $config['encrypt_name']  = TRUE;
+            $config['max_size'] = 5000;
+            $config['encrypt_name'] = TRUE;
 
             $this->load->library('upload', $config);
             $this->upload->initialize($config);
@@ -367,40 +332,37 @@ class Admin extends CI_Controller {
         else redirect('admin/content');
     }
 
-    // Hapus Event
     public function delete_event($id) {
         $this->Admin_model->delete_event($id);
         $this->session->set_flashdata('success', 'Event dihapus.');
-        if($this->session->userdata('role') == 'super_admin') redirect('admin/super');
-        else redirect('admin/content');
+        redirect('admin/content');
     }
 
-
-    // ==========================================
-    // BAGIAN 4: SUPER ADMIN (MANAJEMEN USER)
-    // ==========================================
-
+    public function get_event_volunteers($event_id) {
+        if (!$this->session->userdata('logged_in')) return;
+        $this->db->where('event_id', $event_id);
+        $this->db->order_by('registered_at', 'DESC');
+        $data = $this->db->get('volunteers')->result();
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+    
+    // --- SUPER ADMIN ---
     public function super() {
         if ($this->session->userdata('role') !== 'super_admin') show_404();
-        
         $data['title'] = "Super Admin Control Panel";
         $data['user'] = $this->session->userdata();
         $data['admins'] = $this->Admin_model->get_all_admins();
-        
-        // Statistik Global
         $data['count_admin'] = count($data['admins']);
         $data['count_event'] = $this->Admin_model->get_count('volunteer_events');
         $data['count_report'] = $this->Admin_model->get_count('waste_reports');
         $data['total_fund'] = $this->Admin_model->get_balance();
-        
         $data['content'] = 'admin/super';
-        $this->load->view('layout/lay_admin', $data);
+        $this->load->view('layout/admin', $data);
     }
 
     public function add_admin() {
-        // Hanya Super Admin
         if ($this->session->userdata('role') !== 'super_admin') redirect('admin');
-
         $data = [
             'username' => $this->input->post('username'),
             'email' => $this->input->post('email'),
@@ -413,9 +375,7 @@ class Admin extends CI_Controller {
     }
 
     public function delete_admin($id) {
-        // Hanya Super Admin
         if ($this->session->userdata('role') !== 'super_admin') redirect('admin');
-
         if($id == $this->session->userdata('user_id')) {
             $this->session->set_flashdata('error', 'Tidak bisa menghapus diri sendiri!');
         } else {
