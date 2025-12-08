@@ -59,9 +59,9 @@ class Auth extends CI_Controller {
         $role = $this->session->userdata('role');
 
         if ($role === 'finance') {
-            redirect('admin/finance');
+            redirect('finance');
         } elseif ($role === 'field_coordinator') {
-            redirect('admin/content');
+            redirect('content');
         } else {
             // Default ke Super Admin jika role super_admin atau tidak dikenali
             redirect('admin/super');
