@@ -5,10 +5,15 @@ class App_model extends CI_Model {
 
     // --- BAGIAN KEUANGAN & DONASI ---
     
+    // REVISI: Saldo diambil langsung dari total current_balance di tabel accounts
     public function get_saldo() {
-        $masuk = $this->db->select_sum('amount')->where('status', 'verified')->get('donations')->row()->amount;
-        $keluar = $this->db->select_sum('amount')->get('expenses')->row()->amount;
-        return $masuk - $keluar;
+        $result = $this->db->select_sum('current_balance')->get('accounts')->row();
+        return $result->current_balance ?? 0;
+    }
+
+    // FITUR BARU: Ambil semua akun bank aktif untuk ditampilkan di form donasi
+    public function get_active_accounts() {
+        return $this->db->where('is_active', 1)->get('accounts')->result();
     }
 
     public function get_verified_donations() {
@@ -44,7 +49,6 @@ class App_model extends CI_Model {
     }
 
     public function get_resolved_reports() {
-        // Filter hanya yang statusnya resolved DAN punya foto after
         return $this->db->where('status', 'resolved')
                         ->where('image_after_url !=', NULL)
                         ->order_by('cleaned_at', 'DESC') 
@@ -55,7 +59,7 @@ class App_model extends CI_Model {
         return $this->db->insert('waste_reports', $data);
     }
 
-    // --- FITUR BARU: VIEW COUNT ---
+    // --- FITUR VIEW COUNT ---
     public function increment_views($report_id) {
         $this->db->set('views', 'views+1', FALSE);
         $this->db->where('id', $report_id);
