@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+#[AllowDynamicProperties]
 class Web extends CI_Controller {
 
     public function __construct() {
@@ -123,7 +124,7 @@ class Web extends CI_Controller {
     public function volunteer() {
         $data['title'] = "Volunteer Hub - SocialAct";
         
-        $events = $this->App_model->get_all_events(); 
+        $events = $this->App_model->get_upcoming_events(); 
         foreach ($events as &$ev) {
             if ($this->db->table_exists('volunteers')) {
                 $ev->registered_count = $this->db->where('event_id', $ev->id)->count_all_results('volunteers');
