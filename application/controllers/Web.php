@@ -69,7 +69,7 @@ class Web extends CI_Controller {
             $upload_data = $this->upload->data();
             $file_name = $upload_data['file_name']; 
             
-            $db_path = 'uploads/reports/' . $file_name;
+            $db_path = $file_name;
 
             $data = [
                 'reporter_name' => $this->input->post('reporter_name'),
