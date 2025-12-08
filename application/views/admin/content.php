@@ -270,7 +270,7 @@
                     <button onclick="openEditEventModal(<?= $evDataJson ?>)" class="flex-1 bg-gray-800 text-gray-300 py-2 rounded text-xs font-bold text-center hover:bg-gray-700 hover:text-white transition">
                         <i class="fas fa-edit mr-1"></i> Edit
                     </button>
-                    <a href="<?= base_url('admin/delete_event/'.$ev->id) ?>" onclick="return confirm('Hapus event ini?')" class="flex-1 bg-red-900/20 text-red-400 border border-red-900/50 py-2 rounded text-xs font-bold text-center hover:bg-red-900/40 transition">
+                    <a href="<?= base_url('content/delete_event/'.$ev->id) ?>" onclick="return confirm('Hapus event ini?')" class="flex-1 bg-red-900/20 text-red-400 border border-red-900/50 py-2 rounded text-xs font-bold text-center hover:bg-red-900/40 transition">
                         <i class="fas fa-trash mr-1"></i>
                     </a>
                 </div>
@@ -333,7 +333,7 @@
             <button type="button" onclick="closeEventModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
 
-        <?= form_open_multipart('admin/add_event', ['id' => 'eventForm']) ?>
+        <?= form_open_multipart('content/add_event', ['id' => 'eventForm']) ?>
             <input type="hidden" name="event_id" id="evt_id"> 
             <input type="hidden" name="latitude" id="evt_lat">
             <input type="hidden" name="longitude" id="evt_lng">
@@ -472,7 +472,7 @@
 
     function openAddEventModal() {
         document.getElementById('eventModalTitle').innerText = "Buat Event Baru";
-        document.getElementById('eventForm').action = "<?= base_url('admin/add_event') ?>";
+        document.getElementById('eventForm').action = "<?= base_url('content/add_event') ?>";
         document.getElementById('eventForm').reset();
         document.getElementById('evt_id').value = ""; 
         document.getElementById('upload-placeholder-event').classList.remove('hidden');
@@ -483,7 +483,7 @@
 
     function openEditEventModal(data) {
         document.getElementById('eventModalTitle').innerText = "Edit Event";
-        document.getElementById('eventForm').action = "<?= base_url('admin/edit_event') ?>";
+        document.getElementById('eventForm').action = "<?= base_url('content/edit_event') ?>";
         document.getElementById('evt_id').value = data.id;
         document.getElementById('evt_name').value = data.event_name;
         document.getElementById('evt_date').value = data.event_date.replace(' ', 'T');
@@ -532,7 +532,7 @@
         loading.classList.remove('hidden');
         empty.classList.add('hidden');
 
-        fetch('<?= base_url('admin/get_event_volunteers/') ?>' + eventId)
+        fetch('<?= base_url('content/get_event_volunteers/') ?>' + eventId)
             .then(response => response.json())
             .then(data => {
                 loading.classList.add('hidden');
