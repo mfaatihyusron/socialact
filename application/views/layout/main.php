@@ -70,6 +70,7 @@
         <div class="hidden md:flex gap-6 text-sm font-semibold tracking-wide uppercase text-gray-300">
 
             <a href="<?= base_url('transparansi') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'transparansi' ? 'text-brand-green' : '' ?>">Transparansi</a>
+            <a href="<?= base_url('donasi') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'donasi' ? 'text-brand-green' : '' ?>">Donasi</a>
             <a href="<?= base_url('lapor') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'lapor' ? 'text-brand-green' : '' ?>">Pengaduan</a>          
             <!-- Link Admin (Opsional, saya taruh di ujung kanan sebagai icon) -->
             <a href="<?= base_url('volunteer') ?>" class="hover:text-brand-green transition-colors <?= $this->uri->segment(1) == 'volunteer' ? 'text-brand-green' : '' ?>">Volunteer</a>

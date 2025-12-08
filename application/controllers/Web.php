@@ -18,6 +18,12 @@ class Web extends CI_Controller {
         $data['content'] = 'content/home'; 
         $this->load->view('layout/main', $data);
     }
+    
+    public function donasi() {
+        $data['title'] = "Donasi - SocialAct";
+        $data['content'] = 'content/donasi'; 
+        $this->load->view('layout/main', $data);
+    }
 
     public function transparansi() {
         $data['title'] = "Transparansi Dana - SocialAct";
@@ -105,6 +111,7 @@ class Web extends CI_Controller {
         $this->load->library('upload', $config);
 
         $proof_url = null;
+        $this->upload->initialize($config);
         if ($this->upload->do_upload('transfer_proof')) {
             $upload_data = $this->upload->data();
             $proof_url = $upload_data['file_name'];
