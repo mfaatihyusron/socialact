@@ -18,21 +18,19 @@ class Web extends CI_Controller {
         $data['content'] = 'content/home'; 
         $this->load->view('layout/main', $data);
     }
-    
-    public function donasi() {
-        $data['title'] = "Donasi - SocialAct";
-        $data['content'] = 'content/donasi'; 
-        $this->load->view('layout/main', $data);
-    }
 
     public function transparansi() {
         $data['title'] = "Transparansi Dana - SocialAct";
+        
         $data['saldo'] = $this->App_model->get_saldo();
         $data['total_masuk'] = $this->App_model->get_total_masuk();
         $data['total_keluar'] = $this->App_model->get_total_keluar();
         $data['pengeluaran'] = $this->App_model->get_all_expenses();
-        $data['donasi'] = $this->App_model->get_verified_donations();
+        $data['donasi_masuk'] = $this->App_model->get_verified_donations(); 
+        
+        // REVISI: Menggunakan Murni Data Database (Tanpa Dummy)
         $data['chart_data'] = $this->App_model->get_chart_data();
+        
         $data['content'] = 'content/transparansi';
         $this->load->view('layout/main', $data);
     }
@@ -45,20 +43,18 @@ class Web extends CI_Controller {
         $this->load->view('layout/main', $data);
     }
 
-    // --- FIX UPLOAD LAPOR (PUBLIK) ---
-    public function lapor_submit() {
-        // Use same format as working event upload
+    // --- FIX UPLOAD LAPOR (MERGED: Logic Teman + Nama Method Lama) ---
+    public function submit_laporan() {
+        // Menggunakan FCPATH sesuai update teman agar path absolut server terbaca
         $path = FCPATH . 'uploads/reports/';
         if (!is_dir($path)) mkdir($path, 0777, true);
 
-        log_message('debug', 'FCPATH: ' . FCPATH);
+        // Logging untuk debugging (Fitur teman)
         log_message('debug', 'Upload path: ' . $path);
-        log_message('debug', 'is_dir($path): ' . (is_dir($path) ? 'true' : 'false'));
-        log_message('debug', 'is_writable($path): ' . (is_writable($path) ? 'true' : 'false'));
 
         $config['upload_path']   = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg';
-        $config['max_size']      = 10240;
+        $config['max_size']      = 10240; // 10MB
         $config['encrypt_name']  = TRUE;
 
         $this->load->library('upload', $config);
@@ -66,39 +62,46 @@ class Web extends CI_Controller {
 
         if ( ! $this->upload->do_upload('image_before')) {
             $error = $this->upload->display_errors();
-            log_message('error', 'Upload failed in lapor_submit: ' . $error);
-            log_message('error', 'Config used: ' . json_encode($config));
+            log_message('error', 'Upload failed: ' . $error);
             $this->session->set_flashdata('error', 'Upload foto gagal: ' . $error);
-            $file_name = 'default.jpg';
+            redirect('web/lapor');
         } else {
             $upload_data = $this->upload->data();
-            $file_name = $upload_data['file_name'];
-            log_message('info', 'Upload successful in lapor_submit: ' . $file_name);
-        }
+            $file_name = $upload_data['file_name']; 
+            
+            $db_path = 'uploads/reports/' . $file_name;
 
-        $data = [
-            'reporter_name' => $this->input->post('reporter_name'),
-            'reporter_contact' => $this->input->post('reporter_contact'),
-            'location_address' => $this->input->post('location_address'),
-            'latitude' => $this->input->post('latitude'),
-            'longitude' => $this->input->post('longitude'),
-            'description' => $this->input->post('description'),
-            'image_before_url' => $file_name,
-            'status' => 'pending',
-            'created_at' => date('Y-m-d H:i:s'),
-            'views' => 0
-        ];
+            $data = [
+                'reporter_name' => $this->input->post('reporter_name'),
+                'reporter_contact' => $this->input->post('reporter_contact'),
+                'location_address' => $this->input->post('location_address'),
+                'latitude' => $this->input->post('latitude'),
+                'longitude' => $this->input->post('longitude'),
+                'description' => $this->input->post('description'),
+                'image_before_url' => $db_path,
+                'status' => 'pending',
+                'created_at' => date('Y-m-d H:i:s'),
+                'views' => 0
+            ];
 
-        if($this->App_model->insert_report($data)) {
-            $this->session->set_flashdata('success', 'Laporan berhasil dikirim! Menunggu verifikasi admin.');
-        } else {
-            $this->session->set_flashdata('error', 'Gagal menyimpan ke database.');
+            if($this->App_model->insert_report($data)) {
+                $this->session->set_flashdata('success', 'Laporan berhasil dikirim! Menunggu verifikasi admin.');
+            } else {
+                $this->session->set_flashdata('error', 'Gagal menyimpan ke database.');
+            }
+            redirect('web/lapor');
         }
-        
-        redirect('web/lapor');
     }
 
-    // --- FITUR BARU TEMEN LU: SUBMIT DONASI ---
+    // --- FITUR DONASI (MERGED: Logic Kita + Upload Teman) ---
+    public function donasi() {
+        $data['title'] = "Donasi - SocialAct";
+        // PENTING: Ambil data akun bank untuk dropdown/pilihan
+        $data['accounts'] = $this->App_model->get_active_accounts();
+        $data['content'] = 'content/donasi'; 
+        $this->load->view('layout/main', $data);
+    }
+
     public function submit_donasi() {
         $path = FCPATH . 'uploads/donations/';
         if (!is_dir($path)) mkdir($path, 0777, true);
@@ -109,12 +112,12 @@ class Web extends CI_Controller {
         $config['encrypt_name']  = TRUE; 
 
         $this->load->library('upload', $config);
-
-        $proof_url = null;
         $this->upload->initialize($config);
+
+        $proof_filename = null;
         if ($this->upload->do_upload('transfer_proof')) {
             $upload_data = $this->upload->data();
-            $proof_url = $upload_data['file_name'];
+            $proof_filename = $upload_data['file_name']; 
         }
 
         $data = [
@@ -122,14 +125,17 @@ class Web extends CI_Controller {
             'donor_email' => $this->input->post('donor_email'),
             'amount' => $this->input->post('amount'),
             'message' => $this->input->post('message'),
-            'transfer_proof_url' => $proof_url,
-            'account_id' => 1, // Default BCA
-            'status' => 'pending'
+            'account_id' => $this->input->post('account_id'), 
+            'is_anonymous' => $this->input->post('is_anonymous') ? 1 : 0,
+            'transfer_proof_url' => $proof_filename,
+            'status' => 'pending',
+            'created_at' => date('Y-m-d H:i:s')
         ];
 
         $this->App_model->insert_donation($data);
         $this->session->set_flashdata('success', 'Terima kasih! Donasi Anda sedang diverifikasi.');
-        redirect('web/transparansi'); // Redirect ke Transparansi
+        
+        redirect('web/donasi'); 
     }
 
     public function add_view($report_id) {
