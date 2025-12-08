@@ -115,10 +115,10 @@
             <div class="pt-3 border-t border-gray-700 mt-auto">
                 <?php if($rp->status == 'pending'): ?>
                     <div class="flex gap-2">
-                        <a href="<?= base_url('admin/update_report_status/'.$rp->id.'/in_progress') ?>" class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white py-2 rounded text-xs font-bold text-center transition hover:shadow-lg">
+                        <a href="<?= base_url('content/update_report_status/'.$rp->id.'/in_progress') ?>" class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white py-2 rounded text-xs font-bold text-center transition hover:shadow-lg">
                             <i class="fas fa-tools mr-1"></i> Proses
                         </a>
-                        <a href="<?= base_url('admin/update_report_status/'.$rp->id.'/rejected') ?>" onclick="return confirm('Yakin tolak?')" class="px-4 py-2 bg-transparent border border-red-800 text-red-400 rounded text-xs font-bold hover:bg-red-900/30 transition">
+                        <a href="<?= base_url('content/update_report_status/'.$rp->id.'/rejected') ?>" onclick="return confirm('Yakin tolak?')" class="px-4 py-2 bg-transparent border border-red-800 text-red-400 rounded text-xs font-bold hover:bg-red-900/30 transition">
                             <i class="fas fa-times"></i>
                         </a>
                     </div>
@@ -298,7 +298,7 @@
             <p class="text-xs text-gray-400">Upload foto kondisi setelah dibersihkan (After).</p>
         </div>
         
-        <?= form_open_multipart('admin/resolve_report') ?>
+        <?= form_open_multipart('content/resolve_report') ?>
             <input type="hidden" name="report_id" id="modal_report_id">
             
             <div class="mb-6">

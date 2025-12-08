@@ -41,22 +41,33 @@ class Web extends CI_Controller {
 
     // --- FIX UPLOAD LAPOR (PUBLIK) ---
     public function lapor_submit() {
-        // Fix Windows Path
+        // Use same format as working event upload
         $path = FCPATH . 'uploads/reports/';
         if (!is_dir($path)) mkdir($path, 0777, true);
 
-        $config['upload_path']   = $path; 
+        log_message('debug', 'FCPATH: ' . FCPATH);
+        log_message('debug', 'Upload path: ' . $path);
+        log_message('debug', 'is_dir($path): ' . (is_dir($path) ? 'true' : 'false'));
+        log_message('debug', 'is_writable($path): ' . (is_writable($path) ? 'true' : 'false'));
+
+        $config['upload_path']   = $path;
         $config['allowed_types'] = 'gif|jpg|png|jpeg';
-        $config['max_size']      = 10240; 
+        $config['max_size']      = 10240;
         $config['encrypt_name']  = TRUE;
 
         $this->load->library('upload', $config);
+        $this->upload->initialize($config);
 
         if ( ! $this->upload->do_upload('image_before')) {
+            $error = $this->upload->display_errors();
+            log_message('error', 'Upload failed in lapor_submit: ' . $error);
+            log_message('error', 'Config used: ' . json_encode($config));
+            $this->session->set_flashdata('error', 'Upload foto gagal: ' . $error);
             $file_name = 'default.jpg';
         } else {
             $upload_data = $this->upload->data();
             $file_name = $upload_data['file_name'];
+            log_message('info', 'Upload successful in lapor_submit: ' . $file_name);
         }
 
         $data = [

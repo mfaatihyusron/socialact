@@ -49,3 +49,7 @@ $route['admin/dashboard'] = 'admin/dashboard';
 $route['admin/finance'] = 'admin/finance';
 $route['admin/content'] = 'admin/content';
 $route['admin/super'] = 'admin/super';
+
+// Route Content Controller (for report management)
+$route['content'] = 'content/index';
+$route['content/(:any)'] = 'content/$1';
