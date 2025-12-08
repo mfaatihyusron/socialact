@@ -14,17 +14,18 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <div class="bg-brand-dark p-8 rounded-2xl border border-gray-800 relative overflow-hidden group hover:border-brand-green/30 transition-all">
             <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-wallet text-6xl text-white"></i></div>
-            <p class="text-gray-500 text-xs font-bold uppercase mb-2 tracking-wider">Sisa Saldo (Live)</p>
+            <p class="text-gray-500 text-xs font-bold uppercase mb-2 tracking-wider">Total Saldo Rekening (Live)</p>
             <h2 class="text-4xl font-heading font-bold text-white">Rp <?= number_format($saldo ?? 0, 0, ',', '.') ?></h2>
+            <p class="text-[10px] text-gray-500 mt-1">*Total saldo dari seluruh akun bank terdaftar</p>
         </div>
         <div class="bg-brand-dark p-8 rounded-2xl border border-gray-800 relative overflow-hidden group hover:border-brand-green/30 transition-all">
             <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-arrow-down text-6xl text-brand-green"></i></div>
-            <p class="text-gray-500 text-xs font-bold uppercase mb-2 tracking-wider">Total Masuk (Verified)</p>
+            <p class="text-gray-500 text-xs font-bold uppercase mb-2 tracking-wider">Total Donasi Masuk (Verified)</p>
             <h2 class="text-4xl font-heading font-bold text-brand-green">+Rp <?= number_format($total_masuk ?? 0, 0, ',', '.') ?></h2>
         </div>
         <div class="bg-brand-dark p-8 rounded-2xl border border-gray-800 relative overflow-hidden group hover:border-brand-green/30 transition-all">
             <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fas fa-arrow-up text-6xl text-red-500"></i></div>
-            <p class="text-gray-500 text-xs font-bold uppercase mb-2 tracking-wider">Total Penggunaan</p>
+            <p class="text-gray-500 text-xs font-bold uppercase mb-2 tracking-wider">Total Penggunaan Dana</p>
             <h2 class="text-4xl font-heading font-bold text-red-500">-Rp <?= number_format($total_keluar ?? 0, 0, ',', '.') ?></h2>
         </div>
     </div>
@@ -75,8 +76,7 @@
     <!-- Tabel Pemasukan (Donasi) -->
     <div class="bg-brand-dark rounded-2xl border border-gray-800 overflow-hidden mb-16">
         <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-            <h3 class="font-bold text-xl uppercase text-white"><span class="text-brand-green">IN</span> - Donasi Masuk Terverifikasi</h3>
-            <!-- Tombol kecil dihapus dari sini -->
+            <h3 class="font-bold text-xl uppercase text-white"><span class="text-brand-green">IN</span> - Daftar Si Dermawan </h3>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -92,7 +92,8 @@
                     <?php if(!empty($donasi_masuk)): foreach($donasi_masuk as $d): ?>
                     <tr class="hover:bg-gray-800/50">
                         <td class="p-4 font-mono text-xs text-gray-500"><?= date('d M Y', strtotime($d->created_at)) ?></td>
-                        <td class="p-4 font-bold text-white"><?= $d->is_anonymous ? 'Hamba Allah' : $d->donor_name ?></td>
+                        <!-- Logic Anonim -->
+                        <td class="p-4 font-bold text-white"><?= $d->is_anonymous == 1 ? 'Hamba Allah' : $d->donor_name ?></td>
                         <td class="p-4 text-xs italic text-gray-500">"<?= $d->message ?? '-' ?>"</td>
                         <td class="p-4 text-right text-brand-green font-mono">+Rp <?= number_format($d->amount, 0, ',', '.') ?></td>
                     </tr>
@@ -104,10 +105,8 @@
         </div>
     </div>
 
-    <!-- SECTION AJAKAN DONASI (HIGHLIGHTED & PALING BAWAH) -->
+    <!-- SECTION AJAKAN DONASI (HIGHLIGHTED) -->
     <div class="relative rounded-2xl overflow-hidden p-10 md:p-14 text-center border border-brand-green/30 bg-[#0f1510] shadow-[0_0_50px_rgba(16,185,129,0.1)]">
-        
-        <!-- Efek Dekorasi -->
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-green to-transparent"></div>
         <div class="absolute -left-20 top-1/2 w-60 h-60 bg-brand-green/10 rounded-full blur-3xl"></div>
         <div class="absolute -right-20 top-1/2 w-60 h-60 bg-brand-green/10 rounded-full blur-3xl"></div>
@@ -123,7 +122,6 @@
                 Dana yang terkumpul akan digunakan sepenuhnya untuk operasional pembersihan sungai, peralatan relawan, dan logistik. Transparansi adalah janji kami.
             </p>
             
-            <!-- Tombol Highlight Besar -->
             <a href="<?= base_url('donasi') ?>" class="group inline-flex items-center gap-3 px-10 py-5 bg-brand-green text-black font-bold text-xl uppercase tracking-widest rounded hover:bg-white hover:scale-105 transition-all shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:shadow-[0_0_50px_rgba(255,255,255,0.6)]">
                 <span>Donasi Sekarang</span>
                 <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
@@ -134,7 +132,6 @@
             </p>
         </div>
     </div>
-
 </div>
 
 <script>
