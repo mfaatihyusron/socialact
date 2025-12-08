@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Dec 07, 2025 at 02:07 PM
+-- Host: 127.0.0.1
+-- Generation Time: Dec 08, 2025 at 05:07 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -157,7 +157,8 @@ CREATE TABLE `volunteer_events` (
 INSERT INTO `volunteer_events` (`id`, `event_name`, `description`, `event_date`, `location`, `registration_link`, `banner_image_url`, `status`, `created_at`) VALUES
 (2, 'Bersih Bersih Kerajaan', '', '2025-12-10 18:04:00', 'JL Musholla', NULL, NULL, 'completed', '2025-12-07 11:05:07'),
 (3, 'Bersih Bersih Kerajaan', '', '2025-12-07 18:23:00', 'JL Musholla', NULL, NULL, 'completed', '2025-12-07 11:23:23'),
-(4, 'Bersih Bersih Kerajaan', 'Pokoknya bersih bersih dah\r\n', '2025-12-11 19:27:00', 'JL Musholla', NULL, NULL, 'upcoming', '2025-12-07 12:28:07');
+(4, 'Bersih Bersih Kerajaan', 'Pokoknya bersih bersih dah\r\n', '2025-12-11 19:27:00', 'JL Musholla', NULL, NULL, 'upcoming', '2025-12-07 12:28:07'),
+(5, 'Sampah sungai mumtaz', 'jelek bgt tampilan form yg bener aja', '2004-02-11 12:00:00', 'Jakarta', NULL, 'ad74657fcc4aa4b9c43f545311a22072.png', 'upcoming', '2025-12-08 03:47:43');
 
 -- --------------------------------------------------------
 
@@ -193,7 +194,9 @@ INSERT INTO `waste_reports` (`id`, `reporter_name`, `reporter_contact`, `locatio
 (5, '', '', 'Disono', -6.28108200, 106.91310900, '', 'default.jpg', 'default_after.jpg', 'resolved', '2025-12-07', '2025-12-07 04:52:11', 0),
 (6, '', '', 'Bawah Jembatan Merah', -6.27367500, 106.69489600, '', 'default.jpg', 'default_after.jpg', 'resolved', '2025-12-07', '2025-12-07 05:53:27', 0),
 (7, '', '', 'Bawah Jembatan Merah', -6.27367500, 106.69489600, '', 'default.jpg', 'default_after.jpg', 'resolved', '2025-12-07', '2025-12-07 05:53:36', 0),
-(8, 'Budi', '088123123123', 'Bawah Jembatan Merah', -6.27294300, 106.94091800, '', 'default.jpg', NULL, 'pending', NULL, '2025-12-07 06:52:49', 0);
+(8, 'Budi', '088123123123', 'Bawah Jembatan Merah', -6.27294300, 106.94091800, '', 'default.jpg', NULL, 'pending', NULL, '2025-12-07 06:52:49', 0),
+(9, 'Yunai', '9898989', 'sungai nganjuk', -6.31222700, 106.78161600, 'emgh', 'default.jpg', NULL, 'pending', NULL, '2025-12-07 07:17:47', 0),
+(10, 'Yunai', '9898989', 'sungai nganjuk', -7.55895600, 110.85231200, 'kureng', 'default.jpg', NULL, 'pending', NULL, '2025-12-07 21:52:21', 0);
 
 --
 -- Indexes for dumped tables
@@ -284,13 +287,13 @@ ALTER TABLE `volunteers`
 -- AUTO_INCREMENT for table `volunteer_events`
 --
 ALTER TABLE `volunteer_events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `waste_reports`
 --
 ALTER TABLE `waste_reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
